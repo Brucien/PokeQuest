@@ -65,194 +65,72 @@
         
         <!-- ================= MISSIONS TAB ================= -->
         <section id="tab-content-missions" class="space-y-8 animate-fade-in">
-            <div class="bg-gradient-to-r from-slate-900 to-indigo-950/40 p-6 rounded-2xl border border-indigo-500/10 shadow-xl">
-                <h2 class="text-xl font-bold mb-1 text-white flex items-center gap-2">
-                    <span>🧭</span> Campaign Overview
-                </h2>
-                <p class="text-xs text-slate-400 leading-relaxed max-w-3xl">
-                    Welcome to the <strong>PokeQuest Master Campaign</strong>. By utilizing your legacy hardware (DS Lite, New 3DS XL, Virtual Console, physical carts) and bridging them with modern consoles, you are preparing to build a living museum. Follow the targeted operations below to secure the rarest species first!
-                </p>
+            <div class="bg-gradient-to-r from-slate-900 to-indigo-950/40 p-6 rounded-2xl border border-indigo-500/10 shadow-xl flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div>
+                    <h2 class="text-xl font-bold mb-1 text-white flex items-center gap-2">
+                        <span>🧭</span> Campaign Overview
+                    </h2>
+                    <p class="text-xs text-slate-400 leading-relaxed max-w-3xl">
+                        Welcome to the <strong>PokeQuest Master Campaign</strong>. By utilizing your legacy hardware (DS Lite, New 3DS XL, Virtual Console, physical carts) and bridging them with modern consoles, you are preparing to build a living museum. Follow the targeted operations below to secure the rarest species first!
+                    </p>
+                </div>
+                <button onclick="toggleCreateMissionPanel()" class="shrink-0 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs px-5 py-3 rounded-xl transition duration-200 shadow-md shadow-indigo-600/20 hover:scale-[1.02]">
+                    ➕ Create Custom Mission
+                </button>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <!-- Mission 1 Card -->
-                <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-5 hover:border-slate-700/60 transition-all flex flex-col justify-between">
-                    <div>
-                        <div class="flex items-start justify-between mb-4">
-                            <div>
-                                <span class="bg-emerald-500/10 text-emerald-400 text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider border border-emerald-500/20">Mission 1</span>
-                                <h3 class="text-base font-bold text-white mt-2">The 100% Legit Shiny Mythical</h3>
-                                <p class="text-xs text-slate-400 mt-1">Platform: <strong>VC Crystal (3DS)</strong></p>
-                            </div>
-                            <span class="text-3xl">🧅</span>
-                        </div>
-                        <p class="text-xs text-slate-300 leading-relaxed mb-5">
-                            Beat the Johto Elite Four to unlock the legendary, native GS Ball event in Goldenrod City. This is the only place in mainline Pokémon history to hunt an infinite, completely legitimate Shiny Celebi.
-                        </p>
-                        <ul class="space-y-3 border-t border-slate-800/80 pt-4">
-                            <li class="flex items-start space-x-3 text-xs text-slate-300">
-                                <input type="checkbox" id="m1_t1" onchange="toggleTask('m1_t1')" class="mt-0.5 h-4 w-4 rounded border-slate-700 bg-slate-800 text-indigo-500 focus:ring-0 focus:ring-offset-0 transition cursor-pointer">
-                                <label for="m1_t1" class="cursor-pointer">Beat the Elite Four and enter the Hall of Fame.</label>
-                            </li>
-                            <li class="flex items-start space-x-3 text-xs text-slate-300">
-                                <input type="checkbox" id="m1_t2" onchange="toggleTask('m1_t2')" class="mt-0.5 h-4 w-4 rounded border-slate-700 bg-slate-800 text-indigo-500 focus:ring-0 focus:ring-offset-0 transition cursor-pointer">
-                                <label for="m1_t2" class="cursor-pointer">Trigger the GS Ball event inside the Goldenrod City Pokémon Center.</label>
-                            </li>
-                            <li class="flex items-start space-x-3 text-xs text-slate-300">
-                                <input type="checkbox" id="m1_t3" onchange="toggleTask('m1_t3')" class="mt-0.5 h-4 w-4 rounded border-slate-700 bg-slate-800 text-indigo-500 focus:ring-0 focus:ring-offset-0 transition cursor-pointer">
-                                <label for="m1_t3" class="cursor-pointer">Deliver the GS Ball to Kurt in Azalea Town and wait exactly 24 hours.</label>
-                            </li>
-                            <li class="flex items-start space-x-3 text-xs text-slate-300">
-                                <input type="checkbox" id="m1_t4" onchange="toggleTask('m1_t4')" class="mt-0.5 h-4 w-4 rounded border-slate-700 bg-slate-800 text-indigo-500 focus:ring-0 focus:ring-offset-0 transition cursor-pointer">
-                                <label for="m1_t4" class="cursor-pointer">Retrieve the active GS Ball from Kurt and save in front of Ilex Shrine.</label>
-                            </li>
-                            <li class="flex items-start space-x-3 text-xs text-slate-300">
-                                <input type="checkbox" id="m1_t5" onchange="toggleTask('m1_t5')" class="mt-0.5 h-4 w-4 rounded border-slate-700 bg-slate-800 text-indigo-500 focus:ring-0 focus:ring-offset-0 transition cursor-pointer">
-                                <label for="m1_t5" class="cursor-pointer font-semibold text-amber-400">Soft-Reset (L+R+Start+Select) until you encounter Shiny Celebi (1/8192 odds).</label>
-                            </li>
-                        </ul>
-                    </div>
+            <!-- Create Custom Mission Slider Panel -->
+            <div id="create-mission-panel" class="hidden bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
+                <div class="border-b border-slate-800 pb-3 flex items-center justify-between">
+                    <h3 class="text-sm font-bold text-white flex items-center gap-2">⚔️ Forge a Custom Quest Route</h3>
+                    <span class="text-[10px] text-indigo-400 font-semibold uppercase tracking-wider">Dynamic Sync Enabled</span>
                 </div>
+                <form id="new-mission-form" onsubmit="createNewMission(event)" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="space-y-1.5">
+                        <label class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Mission Title</label>
+                        <input type="text" id="new-m-title" required placeholder="e.g., Ribbon Hunting Phase" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-indigo-500 transition">
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Platform/Target Game</label>
+                        <input type="text" id="new-m-platform" required placeholder="e.g., Emerald (DS Lite)" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-indigo-500 transition">
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Badge Label</label>
+                        <input type="text" id="new-m-tag" required placeholder="e.g., Mission 6" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-indigo-500 transition">
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Accent Theme Color</label>
+                        <select id="new-m-color" class="w-full px-3 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-indigo-500 transition cursor-pointer">
+                            <option value="indigo">💜 Indigo</option>
+                            <option value="emerald">💚 Emerald</option>
+                            <option value="cyan">💙 Cyan</option>
+                            <option value="purple">🔮 Purple</option>
+                            <option value="amber">💛 Amber</option>
+                            <option value="rose">❤️ Rose</option>
+                        </select>
+                    </div>
+                    <div class="space-y-1.5 md:col-span-2">
+                        <label class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Target Emoji Icon</label>
+                        <input type="text" id="new-m-emoji" required placeholder="e.g., 🎗️" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-indigo-500 transition">
+                    </div>
+                    <div class="space-y-1.5 md:col-span-2">
+                        <label class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Mission Objective Description</label>
+                        <textarea id="new-m-desc" required placeholder="Describe what makes this custom mission unique..." class="w-full h-20 px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none resize-none focus:border-indigo-500 transition"></textarea>
+                    </div>
+                    <div class="space-y-1.5 md:col-span-2">
+                        <label class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Task Checklists (Press Enter for new line)</label>
+                        <textarea id="new-m-tasks" required placeholder="Catch wild Heracross&#10;Transfer via Gen 4 bridge&#10;Upgrade ribbons in Sinnoh" class="w-full h-24 px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white font-mono focus:outline-none resize-none focus:border-indigo-500 transition"></textarea>
+                    </div>
+                    <div class="md:col-span-2 flex justify-end gap-3 pt-2">
+                        <button type="button" onclick="toggleCreateMissionPanel()" class="px-4 py-2 bg-slate-950 hover:bg-slate-900 border border-slate-800 rounded-xl text-xs font-semibold text-slate-400 hover:text-white transition">Cancel</button>
+                        <button type="submit" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-500 rounded-xl text-xs font-bold text-white transition shadow-lg shadow-emerald-600/10">Publish Mission</button>
+                    </div>
+                </form>
+            </div>
 
-                <!-- Mission 2 Card -->
-                <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-5 hover:border-slate-700/60 transition-all flex flex-col justify-between">
-                    <div>
-                        <div class="flex items-start justify-between mb-4">
-                            <div>
-                                <span class="bg-cyan-500/10 text-cyan-400 text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider border border-cyan-500/20">Mission 2</span>
-                                <h3 class="text-base font-bold text-white mt-2">The 28-Form Alphabet Soup</h3>
-                                <p class="text-xs text-slate-400 mt-1">Platform: <strong>Platinum (DS Lite)</strong></p>
-                            </div>
-                            <span class="text-3xl">🔤</span>
-                        </div>
-                        <p class="text-xs text-slate-300 leading-relaxed mb-5">
-                            Travel to the Solaceon Ruins in Sinnoh. Capture letters A through Z in the main chambers, expand the Ruin Maniac's tunnel, and enter the hidden chamber to catch the "?" and "!" forms.
-                        </p>
-                        <ul class="space-y-3 border-t border-slate-800/80 pt-4">
-                            <li class="flex items-start space-x-3 text-xs text-slate-300">
-                                <input type="checkbox" id="m2_t1" onchange="toggleTask('m2_t1')" class="mt-0.5 h-4 w-4 rounded border-slate-700 bg-slate-800 text-indigo-500 focus:ring-0 focus:ring-offset-0 transition cursor-pointer">
-                                <label for="m2_t1" class="cursor-pointer">Navigate to Solaceon Ruins on Route 209.</label>
-                            </li>
-                            <li class="flex items-start space-x-3 text-xs text-slate-300">
-                                <input type="checkbox" id="m2_t2" onchange="toggleTask('m2_t2')" class="mt-0.5 h-4 w-4 rounded border-slate-700 bg-slate-800 text-indigo-500 focus:ring-0 focus:ring-offset-0 transition cursor-pointer">
-                                <label for="m2_t2" class="cursor-pointer">Capture all 26 alphabet Unown forms in the ruins' main chambers.</label>
-                            </li>
-                            <li class="flex items-start space-x-3 text-xs text-slate-300">
-                                <input type="checkbox" id="m2_t3" onchange="toggleTask('m2_t3')" class="mt-0.5 h-4 w-4 rounded border-slate-700 bg-slate-800 text-indigo-500 focus:ring-0 focus:ring-offset-0 transition cursor-pointer">
-                                <label for="m2_t3" class="cursor-pointer">Verify the Ruin Maniac's tunnel on Route 210 is fully dug out.</label>
-                            </li>
-                            <li class="flex items-start space-x-3 text-xs text-slate-300">
-                                <input type="checkbox" id="m2_t4" onchange="toggleTask('m2_t4')" class="mt-0.5 h-4 w-4 rounded border-slate-700 bg-slate-800 text-indigo-500 focus:ring-0 focus:ring-offset-0 transition cursor-pointer">
-                                <label for="m2_t4" class="cursor-pointer">Enter the secret top room and capture Unown "?" and "!".</label>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-
-                <!-- Mission 3 Card -->
-                <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-5 hover:border-slate-700/60 transition-all flex flex-col justify-between">
-                    <div>
-                        <div class="flex items-start justify-between mb-4">
-                            <div>
-                                <span class="bg-purple-500/10 text-purple-400 text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider border border-purple-500/20">Mission 3</span>
-                                <h3 class="text-base font-bold text-white mt-2">Dream Ball & Hidden Abilities</h3>
-                                <p class="text-xs text-slate-400 mt-1">Platform: <strong>Dream Radar + HG + Black 2 (3DS)</strong></p>
-                            </div>
-                            <span class="text-3xl">☁️</span>
-                        </div>
-                        <p class="text-xs text-slate-300 leading-relaxed mb-5">
-                            Hook your physical HeartGold cart into your 3DS, boot Dream Radar, and shoot down pink dream clouds. Secure a Multiscale Lugia and the Gen 5 Therian genies caught inside rare, pink Dream Balls.
-                        </p>
-                        <ul class="space-y-3 border-t border-slate-800/80 pt-4">
-                            <li class="flex items-start space-x-3 text-xs text-slate-300">
-                                <input type="checkbox" id="m3_t1" onchange="toggleTask('m3_t1')" class="mt-0.5 h-4 w-4 rounded border-slate-700 bg-slate-800 text-indigo-500 focus:ring-0 focus:ring-offset-0 transition cursor-pointer">
-                                <label for="m3_t1" class="cursor-pointer">Insert physical HeartGold into the 3DS game slot before opening Dream Radar.</label>
-                            </li>
-                            <li class="flex items-start space-x-3 text-xs text-slate-300">
-                                <input type="checkbox" id="m3_t2" onchange="toggleTask('m3_t2')" class="mt-0.5 h-4 w-4 rounded border-slate-700 bg-slate-800 text-indigo-500 focus:ring-0 focus:ring-offset-0 transition cursor-pointer">
-                                <label for="m3_t2" class="cursor-pointer">Unlock the Gilded Cloud Chamber and capture a Multiscale Lugia in a Dream Ball.</label>
-                            </li>
-                            <li class="flex items-start space-x-3 text-xs text-slate-300">
-                                <input type="checkbox" id="m3_t3" onchange="toggleTask('m3_t3')" class="mt-0.5 h-4 w-4 rounded border-slate-700 bg-slate-800 text-indigo-500 focus:ring-0 focus:ring-offset-0 transition cursor-pointer">
-                                <label for="m3_t3" class="cursor-pointer">Capture Therian forms of Landorus, Thundurus, and Tornadus.</label>
-                            </li>
-                            <li class="flex items-start space-x-3 text-xs text-slate-300">
-                                <input type="checkbox" id="m3_t4" onchange="toggleTask('m3_t4')" class="mt-0.5 h-4 w-4 rounded border-slate-700 bg-slate-800 text-indigo-500 focus:ring-0 focus:ring-offset-0 transition cursor-pointer">
-                                <label for="m3_t4" class="cursor-pointer">Send radar creatures to Pokémon Black 2 and staging box 1.</label>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-
-                <!-- Mission 4 Card -->
-                <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-5 hover:border-slate-700/60 transition-all flex flex-col justify-between">
-                    <div>
-                        <div class="flex items-start justify-between mb-4">
-                            <div>
-                                <span class="bg-amber-500/10 text-amber-400 text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider border border-amber-500/20">Mission 4</span>
-                                <h3 class="text-base font-bold text-white mt-2">The Regional Form Factory</h3>
-                                <p class="text-xs text-slate-400 mt-1">Platform: <strong>Ultra Moon (3DS)</strong></p>
-                            </div>
-                            <span class="text-3xl">🌴</span>
-                        </div>
-                        <p class="text-xs text-slate-300 leading-relaxed mb-5">
-                            Produce infinite copies of Alolan variants. If bred outside Alola, eggs hatch into classic Kanto forms. Secure them by using the Everstone item natively in Alola.
-                        </p>
-                        <ul class="space-y-3 border-t border-slate-800/80 pt-4">
-                            <li class="flex items-start space-x-3 text-xs text-slate-300">
-                                <input type="checkbox" id="m4_t1" onchange="toggleTask('m4_t1')" class="mt-0.5 h-4 w-4 rounded border-slate-700 bg-slate-800 text-indigo-500 focus:ring-0 focus:ring-offset-0 transition cursor-pointer">
-                                <label for="m4_t1" class="cursor-pointer">Capture Alolan regional species directly in the wild (Vulpix, Sandshrew, Meowth, etc.).</label>
-                            </li>
-                            <li class="flex items-start space-x-3 text-xs text-slate-300">
-                                <input type="checkbox" id="m4_t2" onchange="toggleTask('m4_t2')" class="mt-0.5 h-4 w-4 rounded border-slate-700 bg-slate-800 text-indigo-500 focus:ring-0 focus:ring-offset-0 transition cursor-pointer">
-                                <label for="m4_t2" class="cursor-pointer">Obtain multiple Everstones (found wild on Roggenrola or picked in trials).</label>
-                            </li>
-                            <li class="flex items-start space-x-3 text-xs text-slate-300">
-                                <input type="checkbox" id="m4_t3" onchange="toggleTask('m4_t3')" class="mt-0.5 h-4 w-4 rounded border-slate-700 bg-slate-800 text-indigo-500 focus:ring-0 focus:ring-offset-0 transition cursor-pointer">
-                                <label for="m4_t3" class="cursor-pointer">Equip an Everstone on the Alolan parent before leaving it at Paniola Ranch.</label>
-                            </li>
-                            <li class="flex items-start space-x-3 text-xs text-slate-300">
-                                <input type="checkbox" id="m4_t4" onchange="toggleTask('m4_t4')" class="mt-0.5 h-4 w-4 rounded border-slate-700 bg-slate-800 text-indigo-500 focus:ring-0 focus:ring-offset-0 transition cursor-pointer">
-                                <label for="m4_t4" class="cursor-pointer">Hatch eggs to confirm offspring retained the proper Alolan typing.</label>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-
-                <!-- Mission 5 Card -->
-                <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-5 hover:border-slate-700/60 transition-all flex flex-col justify-between">
-                    <div>
-                        <div class="flex items-start justify-between mb-4">
-                            <div>
-                                <span class="bg-rose-500/10 text-rose-400 text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider border border-rose-500/20">Mission 5</span>
-                                <h3 class="text-base font-bold text-white mt-2">The Cute Charm Glitch Vault</h3>
-                                <p class="text-xs text-slate-400 mt-1">Platform: <strong>Platinum Copy B (DS Lite)</strong></p>
-                            </div>
-                            <span class="text-3xl">✨</span>
-                        </div>
-                        <p class="text-xs text-slate-300 leading-relaxed mb-5">
-                            Break your second copy of Platinum's RNG system. Force custom Trainer/Secret IDs at startup so Cute Charm boosts wild encounter shiny odds to a massive 21%.
-                        </p>
-                        <ul class="space-y-3 border-t border-slate-800/80 pt-4">
-                            <li class="flex items-start space-x-3 text-xs text-slate-300">
-                                <input type="checkbox" id="m5_t1" onchange="toggleTask('m5_t1')" class="mt-0.5 h-4 w-4 rounded border-slate-700 bg-slate-800 text-indigo-500 focus:ring-0 focus:ring-offset-0 transition cursor-pointer">
-                                <label for="m5_t1" class="cursor-pointer">Wipe save files and configure an external clock/tool to time initial generation down to the exact second.</label>
-                            </li>
-                            <li class="flex items-start space-x-3 text-xs text-slate-300">
-                                <input type="checkbox" id="m5_t2" onchange="toggleTask('m5_t2')" class="mt-0.5 h-4 w-4 rounded border-slate-700 bg-slate-800 text-indigo-500 focus:ring-0 focus:ring-offset-0 transition cursor-pointer">
-                                <label for="m5_t2" class="cursor-pointer">Confirm matching Trainer ID (TID) and Secret ID (SID) combinations inside the summary screen.</label>
-                            </li>
-                            <li class="flex items-start space-x-3 text-xs text-slate-300">
-                                <input type="checkbox" id="m5_t3" onchange="toggleTask('m5_t3')" class="mt-0.5 h-4 w-4 rounded border-slate-700 bg-slate-800 text-indigo-500 focus:ring-0 focus:ring-offset-0 transition cursor-pointer">
-                                <label for="m5_t3" class="cursor-pointer">Obtain a male Pokémon possessing the 'Cute Charm' ability (e.g., Clefairy/Jigglypuff) as your lead party slot.</label>
-                            </li>
-                            <li class="flex items-start space-x-3 text-xs text-slate-300">
-                                <input type="checkbox" id="m5_t4" onchange="toggleTask('m5_t4')" class="mt-0.5 h-4 w-4 rounded border-slate-700 bg-slate-800 text-indigo-500 focus:ring-0 focus:ring-offset-0 transition cursor-pointer">
-                                <label for="m5_t4" class="cursor-pointer">Hunt in wild grass to secure rapid shiny female variants (21% chance).</label>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
+            <!-- Dynamic Mission Render Grid -->
+            <div id="missions-grid" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Dynamically rendered missions are injected here by Javascript -->
             </div>
         </section>
 
@@ -419,15 +297,89 @@
             { num: 251, name: "Celebi", gen: 2, base: false, male: false, female: false, shiny: false, regional: false, form: false }
         ];
 
+        // Dynamic Default Campaigns List
+        const defaultMissions = [
+            {
+                id: "m1",
+                title: "The 100% Legit Shiny Mythical",
+                tag: "Mission 1",
+                color: "emerald",
+                platform: "VC Crystal (3DS)",
+                emoji: "🧅",
+                desc: "Beat the Johto Elite Four to unlock the legendary, native GS Ball event in Goldenrod City. This is the only place in mainline Pokémon history to hunt an infinite, completely legitimate Shiny Celebi.",
+                tasks: [
+                    { id: "m1_t1", text: "Beat the Elite Four and enter the Hall of Fame.", checked: false },
+                    { id: "m1_t2", text: "Trigger the GS Ball event inside the Goldenrod City Pokémon Center.", checked: false },
+                    { id: "m1_t3", text: "Deliver the GS Ball to Kurt in Azalea Town and wait exactly 24 hours.", checked: false },
+                    { id: "m1_t4", text: "Retrieve the active GS Ball from Kurt and save in front of Ilex Shrine.", checked: false },
+                    { id: "m1_t5", text: "Soft-Reset (L+R+Start+Select) until you encounter Shiny Celebi (1/8192 odds).", checked: false }
+                ]
+            },
+            {
+                id: "m2",
+                title: "The 28-Form Alphabet Soup",
+                tag: "Mission 2",
+                color: "cyan",
+                platform: "Platinum (DS Lite)",
+                emoji: "🔤",
+                desc: "Travel to the Solaceon Ruins in Sinnoh. Capture letters A through Z in the main chambers, expand the Ruin Maniac's tunnel, and enter the hidden chamber to catch the '?' and '!' forms.",
+                tasks: [
+                    { id: "m2_t1", text: "Navigate to Solaceon Ruins on Route 209.", checked: false },
+                    { id: "m2_t2", text: "Capture all 26 alphabet Unown forms in the ruins' main chambers.", checked: false },
+                    { id: "m2_t3", text: "Verify the Ruin Maniac's tunnel on Route 210 is fully dug out.", checked: false },
+                    { id: "m2_t4", text: "Enter the secret top room and capture Unown '?' and '!'.", checked: false }
+                ]
+            },
+            {
+                id: "m3",
+                title: "Dream Ball & Hidden Abilities",
+                tag: "Mission 3",
+                color: "purple",
+                platform: "Dream Radar + HG + Black 2 (3DS)",
+                emoji: "☁️",
+                desc: "Hook your physical HeartGold cart into your 3DS, boot Dream Radar, and shoot down pink dream clouds. Secure a Multiscale Lugia and the Gen 5 Therian genies caught inside rare, pink Dream Balls.",
+                tasks: [
+                    { id: "m3_t1", text: "Insert physical HeartGold into the 3DS game slot before opening Dream Radar.", checked: false },
+                    { id: "m3_t2", text: "Unlock the Gilded Cloud Chamber and capture a Multiscale Lugia in a Dream Ball.", checked: false },
+                    { id: "m3_t3", text: "Capture Therian forms of Landorus, Thundurus, and Tornadus.", checked: false },
+                    { id: "m3_t4", text: "Send radar creatures to Pokémon Black 2 and staging box 1.", checked: false }
+                ]
+            },
+            {
+                id: "m4",
+                title: "The Regional Form Factory",
+                tag: "Mission 4",
+                color: "amber",
+                platform: "Ultra Moon (3DS)",
+                emoji: "🌴",
+                desc: "Produce infinite copies of Alolan variants. If bred outside Alola, eggs hatch into classic Kanto forms. Secure them by using the Everstone item natively in Alola.",
+                tasks: [
+                    { id: "m4_t1", text: "Capture Alolan regional species directly in the wild (Vulpix, Sandshrew, Meowth, etc.).", checked: false },
+                    { id: "m4_t2", text: "Obtain multiple Everstones (found wild on Roggenrola or picked in trials).", checked: false },
+                    { id: "m4_t3", text: "Equip an Everstone on the Alolan parent before leaving it at Paniola Ranch.", checked: false },
+                    { id: "m4_t4", text: "Hatch eggs to confirm offspring retained the proper Alolan typing.", checked: false }
+                ]
+            },
+            {
+                id: "m5",
+                title: "The Cute Charm Glitch Vault",
+                tag: "Mission 5",
+                color: "rose",
+                platform: "Platinum Copy B (DS Lite)",
+                emoji: "✨",
+                desc: "Break your second copy of Platinum's RNG system. Force custom Trainer/Secret IDs at startup so Cute Charm boosts wild encounter shiny odds to a massive 21%.",
+                tasks: [
+                    { id: "m5_t1", text: "Wipe save files and configure an external clock/tool to time initial generation down to the exact second.", checked: false },
+                    { id: "m5_t2", text: "Confirm matching Trainer ID (TID) and Secret ID (SID) combinations inside the summary screen.", checked: false },
+                    { id: "m5_t3", text: "Obtain a male Pokémon possessing the 'Cute Charm' ability (e.g., Clefairy/Jigglypuff) as your lead party slot.", checked: false },
+                    { id: "m5_t4", text: "Hunt in wild grass to secure rapid shiny female variants (21% chance).", checked: false }
+                ]
+            }
+        ];
+
         // Central Application Data Structure
         let activePokemonList = [...defaultPokemonList];
-        let missionsState = {
-            m1_t1: false, m1_t2: false, m1_t3: false, m1_t4: false, m1_t5: false,
-            m2_t1: false, m2_t2: false, m2_t3: false, m2_t4: false,
-            m3_t1: false, m3_t2: false, m3_t3: false, m3_t4: false,
-            m4_t1: false, m4_t2: false, m4_t3: false, m4_t4: false,
-            m5_t1: false, m5_t2: false, m5_t3: false, m5_t4: false
-        };
+        let activeMissionsList = [...defaultMissions];
 
         // Pagination State
         let currentPage = 1;
@@ -438,6 +390,7 @@
             loadLocalState();
             refreshSyncAreas();
             updateStatsSummary();
+            renderMissions();
             applyFiltersAndRender();
         };
 
@@ -492,7 +445,7 @@
 
         function saveLocalState() {
             const package = {
-                missions: missionsState,
+                missions: activeMissionsList,
                 pokemon: activePokemonList
             };
             localStorage.setItem('poke_quest_data_v2', JSON.stringify(package));
@@ -505,16 +458,29 @@
             if (savedRaw) {
                 try {
                     const package = JSON.parse(savedRaw);
-                    if (package.missions) {
-                        missionsState = { ...missionsState, ...package.missions };
-                        // Check elements in DOM
-                        Object.keys(missionsState).forEach(id => {
-                            const checkbox = document.getElementById(id);
-                            if (checkbox) checkbox.checked = missionsState[id];
-                        });
-                    }
+                    
+                    // Restore Pokemon list
                     if (package.pokemon && Array.isArray(package.pokemon) && package.pokemon.length > 0) {
                         activePokemonList = package.pokemon;
+                    }
+
+                    // Dynamic Missions Recovery + Backward Compatibility Layer
+                    if (package.missions) {
+                        if (Array.isArray(package.missions)) {
+                            // If it's a dynamic array, restore it directly
+                            activeMissionsList = package.missions;
+                        } else {
+                            // If it's an old legacy checked map (e.g., m1_t1: true), convert map state back to dynamic structure
+                            activeMissionsList = [...defaultMissions].map(m => {
+                                const mappedTasks = m.tasks.map(t => {
+                                    return {
+                                        ...t,
+                                        checked: package.missions[t.id] || false
+                                    };
+                                });
+                                return { ...m, tasks: mappedTasks };
+                            });
+                        }
                     }
                 } catch (e) {
                     console.error("Local recovery error", e);
@@ -522,13 +488,142 @@
             }
         }
 
-        // Toggle Missions
-        function toggleTask(id) {
-            const checkbox = document.getElementById(id);
-            if (checkbox) {
-                missionsState[id] = checkbox.checked;
+        // Toggle custom/creation slider
+        function toggleCreateMissionPanel() {
+            const panel = document.getElementById('create-mission-panel');
+            panel.classList.toggle('hidden');
+        }
+
+        // Action to create custom dynamic mission
+        function createNewMission(event) {
+            event.preventDefault();
+            const title = document.getElementById('new-m-title').value.trim();
+            const platform = document.getElementById('new-m-platform').value.trim();
+            const tag = document.getElementById('new-m-tag').value.trim();
+            const color = document.getElementById('new-m-color').value;
+            const emoji = document.getElementById('new-m-emoji').value.trim();
+            const desc = document.getElementById('new-m-desc').value.trim();
+            const tasksRaw = document.getElementById('new-m-tasks').value.split('\n').map(t => t.trim()).filter(Boolean);
+
+            if (tasksRaw.length === 0) {
+                triggerToast("Add at least one checklist task!", 'error');
+                return;
+            }
+
+            const missionId = "custom_" + Date.now();
+            const processedTasks = tasksRaw.map((text, idx) => {
+                return {
+                    id: `${missionId}_t${idx}`,
+                    text: text,
+                    checked: false
+                };
+            });
+
+            const newMission = {
+                id: missionId,
+                title: title,
+                tag: tag,
+                color: color,
+                platform: platform,
+                emoji: emoji,
+                desc: desc,
+                tasks: processedTasks
+            };
+
+            activeMissionsList.push(newMission);
+            saveLocalState();
+            renderMissions();
+            toggleCreateMissionPanel();
+            
+            event.target.reset();
+            triggerToast(`New mission "${title}" published!`, 'success');
+        }
+
+        // Double confirm native deletion method (compliant with absolute NO confirm() rule)
+        function deleteMission(missionId) {
+            const btn = document.getElementById(`del-btn-${missionId}`);
+            if (btn.dataset.confirm === "true") {
+                activeMissionsList = activeMissionsList.filter(m => m.id !== missionId);
                 saveLocalState();
-                triggerToast("Campaign progress updated!", 'success');
+                renderMissions();
+                triggerToast("Campaign mission removed successfully.", 'success');
+            } else {
+                btn.dataset.confirm = "true";
+                btn.innerText = "⚠️ Confirm?";
+                btn.classList.add('bg-rose-600', 'text-white', 'border-transparent');
+                
+                // Disarm after 3 seconds of inactivity
+                setTimeout(() => {
+                    if (btn) {
+                        btn.dataset.confirm = "false";
+                        btn.innerText = "🗑️";
+                        btn.classList.remove('bg-rose-600', 'text-white', 'border-transparent');
+                    }
+                }, 3000);
+            }
+        }
+
+        // Dynamic campaign card renderer
+        function renderMissions() {
+            const grid = document.getElementById('missions-grid');
+            grid.innerHTML = "";
+
+            activeMissionsList.forEach(m => {
+                const card = document.createElement('div');
+                card.className = "bg-slate-900/60 border border-slate-800 rounded-2xl p-5 hover:border-slate-700/60 transition-all flex flex-col justify-between relative group";
+                
+                // Color mapping logic
+                let colorClass = "bg-indigo-500/10 text-indigo-400 border-indigo-500/20";
+                if (m.color === 'emerald') colorClass = "bg-emerald-500/10 text-emerald-400 border-emerald-500/20";
+                if (m.color === 'cyan') colorClass = "bg-cyan-500/10 text-cyan-400 border-cyan-500/20";
+                if (m.color === 'purple') colorClass = "bg-purple-500/10 text-purple-400 border-purple-500/20";
+                if (m.color === 'amber') colorClass = "bg-amber-500/10 text-amber-400 border-amber-500/20";
+                if (m.color === 'rose') colorClass = "bg-rose-500/10 text-rose-400 border-rose-500/20";
+
+                const tasksHTML = m.tasks.map(t => {
+                    return `
+                        <li class="flex items-start space-x-3 text-xs text-slate-300">
+                            <input type="checkbox" onchange="toggleDynamicTask('${m.id}', '${t.id}')" ${t.checked ? 'checked' : ''} class="mt-0.5 h-4 w-4 rounded border-slate-700 bg-slate-800 text-indigo-500 focus:ring-0 focus:ring-offset-0 transition cursor-pointer">
+                            <span class="cursor-pointer select-none ${t.checked ? 'line-through text-slate-500 italic' : ''}">${t.text}</span>
+                        </li>
+                    `;
+                }).join('');
+
+                card.innerHTML = `
+                    <div>
+                        <div class="flex items-start justify-between mb-4 pr-10">
+                            <div>
+                                <span class="${colorClass} text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider border">${m.tag}</span>
+                                <h3 class="text-base font-bold text-white mt-2">${m.title}</h3>
+                                <p class="text-xs text-slate-400 mt-1">Platform: <strong>${m.platform}</strong></p>
+                            </div>
+                            <span class="text-3xl">${m.emoji}</span>
+                        </div>
+                        <p class="text-xs text-slate-300 leading-relaxed mb-5">${m.desc}</p>
+                        <ul class="space-y-3 border-t border-slate-800/80 pt-4">
+                            ${tasksHTML}
+                        </ul>
+                    </div>
+                    <!-- Inline custom deletion toggle -->
+                    <button id="del-btn-${m.id}" onclick="deleteMission('${m.id}')" class="absolute top-4 right-4 h-8 w-8 rounded-lg border border-slate-800 bg-slate-950 text-slate-500 hover:text-rose-400 flex items-center justify-center text-xs transition duration-200" title="Delete Mission">
+                        🗑️
+                    </button>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // Toggle Dynamic Checkboxes
+        function toggleDynamicTask(missionId, taskId) {
+            const mIdx = activeMissionsList.findIndex(m => m.id === missionId);
+            if (mIdx !== -1) {
+                const tIdx = activeMissionsList[mIdx].tasks.findIndex(t => t.id === taskId);
+                if (tIdx !== -1) {
+                    activeMissionsList[mIdx].tasks[tIdx].checked = !activeMissionsList[mIdx].tasks[tIdx].checked;
+                    saveLocalState();
+                    renderMissions();
+                    triggerToast("Campaign progress updated!", 'success');
+                }
             }
         }
 
@@ -823,7 +918,7 @@
 
         function refreshSyncAreas() {
             const package = {
-                missions: missionsState,
+                missions: activeMissionsList,
                 pokemon: activePokemonList
             };
             // Serialize to readable base64 block to keep transfer tidy
@@ -851,19 +946,29 @@
                 const parsed = JSON.parse(decodedRaw);
                 
                 if (parsed.missions || parsed.pokemon) {
+                    // Import Dynamic Missions List cleanly
                     if (parsed.missions) {
-                        missionsState = parsed.missions;
-                        // Map checklist inputs
-                        Object.keys(missionsState).forEach(id => {
-                            const checkbox = document.getElementById(id);
-                            if (checkbox) checkbox.checked = missionsState[id];
-                        });
+                        if (Array.isArray(parsed.missions)) {
+                            activeMissionsList = parsed.missions;
+                        } else {
+                            // Convert old legacy checkboxes map format automatically
+                            activeMissionsList = [...defaultMissions].map(m => {
+                                const mappedTasks = m.tasks.map(t => {
+                                    return {
+                                        ...t,
+                                        checked: parsed.missions[t.id] || false
+                                    };
+                                });
+                                return { ...m, tasks: mappedTasks };
+                            });
+                        }
                     }
                     if (parsed.pokemon && Array.isArray(parsed.pokemon)) {
                         activePokemonList = parsed.pokemon;
                     }
                     
                     saveLocalState();
+                    renderMissions();
                     applyFiltersAndRender();
                     document.getElementById('sync-import-area').value = "";
                     triggerToast("Sync data loaded successfully!", 'success');
@@ -878,5 +983,3 @@
     </script>
 </body>
 </html>
-
-```
