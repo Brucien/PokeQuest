@@ -1,3 +1,4 @@
+```javascript
 /**
  * PokeQuest - Main Application Logic
  * No external data.js required. Generates full 1025 Dex automatically.
@@ -374,25 +375,54 @@ document.addEventListener('DOMContentLoaded', () => {
     UI.renderMissions();
     UI.renderDex();
 
-    // TABS
+    // MOBILE NAVIGATION TOGGLE (The missing piece!)
+    const navToggle = document.getElementById('nav-toggle');
+    const mobileNav = document.getElementById('mobile-nav');
+    if (navToggle && mobileNav) {
+        navToggle.addEventListener('click', () => {
+            mobileNav.classList.toggle('hidden');
+        });
+    }
+
+    // TABS (Desktop and Mobile)
     document.querySelectorAll('[data-tab]').forEach(btn => {
         btn.addEventListener('click', () => {
             state.currentTab = btn.dataset.tab;
+            
+            // Hide all tab panels
             document.querySelectorAll('[role="tabpanel"]').forEach(p => p.classList.add('hidden'));
+            
+            // Show the target tab panel
             const targetContent = document.getElementById(`tab-content-${state.currentTab}`);
             if (targetContent) targetContent.classList.remove('hidden');
             
-            document.querySelectorAll('nav button').forEach(b => {
-                b.classList.remove('bg-indigo-600', 'text-white');
-                b.classList.add('text-slate-400');
+            // Update Desktop Nav Button styling
+            document.querySelectorAll('#nav-menu button').forEach(b => {
+                b.classList.remove('bg-indigo-600', 'text-white', 'shadow-md', 'shadow-indigo-600/20');
+                b.classList.add('text-slate-400', 'hover:text-white', 'bg-slate-950');
             });
-            btn.classList.add('bg-indigo-600', 'text-white');
-            btn.classList.remove('text-slate-400');
+            const desktopBtn = document.getElementById(`tab-btn-${state.currentTab}`);
+            if (desktopBtn) {
+                desktopBtn.classList.add('bg-indigo-600', 'text-white', 'shadow-md', 'shadow-indigo-600/20');
+                desktopBtn.classList.remove('text-slate-400', 'hover:text-white', 'bg-slate-950');
+            }
             
+            // Update Mobile Nav Button styling
+            document.querySelectorAll('#mobile-nav button').forEach(b => {
+                b.classList.remove('bg-indigo-600', 'text-white');
+                b.classList.add('text-slate-400', 'bg-slate-950');
+            });
+            const mobileBtn = document.getElementById(`tab-btn-${state.currentTab}-mobile`);
+            if (mobileBtn) {
+                mobileBtn.classList.add('bg-indigo-600', 'text-white');
+                mobileBtn.classList.remove('text-slate-400', 'bg-slate-950');
+            }
+            
+            // Re-render views if needed
             if (state.currentTab === 'missions') UI.renderMissions();
             if (state.currentTab === 'dex') UI.renderDex();
             
-            const mobileNav = document.getElementById('mobile-nav');
+            // Close the mobile menu automatically after selection
             if (mobileNav) mobileNav.classList.add('hidden');
         });
     });
@@ -566,3 +596,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
+
+```
