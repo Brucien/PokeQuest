@@ -1,6 +1,7 @@
 /**
  * PokeQuest - Main Application Logic
  * No external data.js required. Generates full 1025 Dex automatically.
+ * Includes PokeAPI Sprites, Shiny Lock validations, and all 10 Master Missions.
  */
 
 const STORAGE_KEY = 'poke_quest_data_v2';
@@ -17,7 +18,15 @@ const GENERATION_RANGES = [
 
 const DEFAULT_GAME_ORDER = ["Emerald", "Crystal", "Yellow", "Platinum", "HeartGold", "Black 2", "Ultra Moon", "Legends: Z-A", "Other"];
 
-// Seed Missions
+// Master list of Pokémon hard-coded to be impossible to get shiny legally.
+// Updated 2026: Volcanion (721) explicitly REMOVED due to the Legends: Z-A HOME event!
+const SHINY_LOCKED_IDS = [
+    494, 647, 648, 720, 789, 790, 801, 802, 891, 892, 893, 
+    896, 897, 898, 905, 1001, 1002, 1003, 1004, 1007, 1008, 1009, 
+    1010, 1014, 1015, 1016, 1017, 1020, 1021, 1022, 1023, 1024, 1025
+];
+
+// Seed Missions (All 10 Tactical Hardware Campaigns)
 const DEFAULT_MISSIONS = [
     {
         id: "m_emerald_cloning", title: "Battle Frontier Cloning Lab", tag: "Emerald (GBA)", color: "emerald", platform: "GBA", game: "Emerald", emoji: "🧪",
@@ -28,6 +37,21 @@ const DEFAULT_MISSIONS = [
         id: "m_crystal_celebi", title: "GS Ball Ilex Forest Event", tag: "Crystal (VC)", color: "purple", platform: "3DS VC", game: "Crystal", emoji: "🧅",
         desc: "Trigger the native Virtual Console Ilex forest shrine event for Shiny Celebi.",
         tasks: [{ id: "c1", text: "Defeat Elite Four", checked: false }, { id: "c2", text: "Obtain GS Ball from Goldenrod", checked: false }, { id: "c3", text: "Soft reset shrine encounter", checked: false }]
+    },
+    {
+        id: "m_crystal_ditto", title: "1-in-64 Shiny breeding Loop", tag: "Crystal (VC)", color: "purple", platform: "3DS VC", game: "Crystal", emoji: "🧬",
+        desc: "Exploit Gen 2's stat-based breeding system. Double-transform a wild Ditto with a Shiny baby to get 1-in-64 shiny eggs.",
+        tasks: [{ id: "d1", text: "Hatch Shiny baby from Odd Egg", checked: false }, { id: "d2", text: "Double-transform wild Ditto", checked: false }, { id: "d3", text: "Breed for 1/64 shinies", checked: false }]
+    },
+    {
+        id: "m_yellow_mew", title: "Bypassing Mew's Transporter Lock", tag: "Yellow (VC)", color: "rose", platform: "3DS VC", game: "Yellow", emoji: "🐱",
+        desc: "Perform Trainer-Fly glitch and train EXP exactly to bypass Bank security.",
+        tasks: [{ id: "y1", text: "Trainer-Fly glitch", checked: false }, { id: "y2", text: "Name GF / Grind EXP to 1,059,860", checked: false }, { id: "y3", text: "Transfer to Bank", checked: false }]
+    },
+    {
+        id: "m_platinum_cutecharm", title: "The 21% Shiny Cute Charm Glitch", tag: "Platinum", color: "indigo", platform: "DS Lite", game: "Platinum", emoji: "💫",
+        desc: "RNG manipulate your TID/SID to force a 21.3% shiny rate with a Cute Charm lead.",
+        tasks: [{ id: "cc1", text: "Hit target TID/SID seed", checked: false }, { id: "cc2", text: "Catch male Cute Charm lead", checked: false }, { id: "cc3", text: "Hunt wild shinies", checked: false }]
     },
     {
         id: "m_platinum_dns", title: "Sinnoh Event DNS Restore", tag: "Platinum", color: "cyan", platform: "DS Lite", game: "Platinum", emoji: "📡",
@@ -48,6 +72,11 @@ const DEFAULT_MISSIONS = [
         id: "m_um_wormhole", title: "Ultra Warp Ride Jackpot", tag: "Ultra Moon", color: "indigo", platform: "3DS", game: "Ultra Moon", emoji: "🌀",
         desc: "Fly 4000+ LY to double-ring wormholes for 36% Shiny odds.",
         tasks: [{ id: "u1", text: "Pass 4,000 LY mark", checked: false }, { id: "u2", text: "Enter Tier 4 double-ring portal", checked: false }]
+    },
+    {
+        id: "m_za_mega", title: "Lumiose Mega Evolution Prep", tag: "Legends: Z-A", color: "emerald", platform: "Switch", game: "Legends: Z-A", emoji: "🗼",
+        desc: "Secure Kalos native species so they are ready to Mega Evolve on day one.",
+        tasks: [{ id: "z1", text: "Secure Gen 6 starters", checked: false }, { id: "z2", text: "Gather Mega-capable species", checked: false }]
     }
 ];
 
@@ -206,8 +235,10 @@ const UI = {
         });
 
         const pct = total > 0 ? Math.round((checked/total)*100) : 0;
-        document.getElementById('overall-progress-text').innerText = `${pct}%`;
-        document.getElementById('overall-progress-bar').style.width = `${pct}%`;
+        const overallText = document.getElementById('overall-progress-text');
+        const overallBar = document.getElementById('overall-progress-bar');
+        if(overallText) overallText.innerText = `${pct}%`;
+        if(overallBar) overallBar.style.width = `${pct}%`;
 
         const grid = document.getElementById('game-progress-grid');
         if (grid) grid.innerHTML = DEFAULT_GAME_ORDER.map(g => {
@@ -246,16 +277,25 @@ const UI = {
 
         const slice = filtered.slice((state.currentPage - 1) * ITEMS_PER_PAGE, state.currentPage * ITEMS_PER_PAGE);
 
-        document.getElementById('pagination-info').innerText = `Showing ${slice.length} of ${totalItems}`;
-        document.getElementById('btn-prev-page').disabled = state.currentPage === 1;
-        document.getElementById('btn-next-page').disabled = state.currentPage === maxPage;
+        const pageInfo = document.getElementById('pagination-info');
+        if(pageInfo) pageInfo.innerText = `Showing ${slice.length} of ${totalItems}`;
+        
+        const btnPrev = document.getElementById('btn-prev-page');
+        const btnNext = document.getElementById('btn-next-page');
+        if(btnPrev) btnPrev.disabled = state.currentPage === 1;
+        if(btnNext) btnNext.disabled = state.currentPage === maxPage;
 
-        document.getElementById('stat-total-pokemon').innerText = state.pokemon.length;
-        document.getElementById('stat-base-caught').innerText = state.pokemon.filter(p => p.caughtNormal || p.caughtShiny).length;
-        document.getElementById('stat-total-forms').innerText = state.pokemon.reduce((acc, curr) => acc + (curr.caughtForms?.length || 0), 0);
+        const statTotal = document.getElementById('stat-total-pokemon');
+        const statBase = document.getElementById('stat-base-caught');
+        const statForms = document.getElementById('stat-total-forms');
+        if(statTotal) statTotal.innerText = state.pokemon.length;
+        if(statBase) statBase.innerText = state.pokemon.filter(p => p.caughtNormal || p.caughtShiny).length;
+        if(statForms) statForms.innerText = state.pokemon.reduce((acc, curr) => acc + (curr.caughtForms?.length || 0), 0);
 
         grid.innerHTML = slice.map(p => {
             const spriteUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${p.num}.png`;
+            const isShinyLocked = SHINY_LOCKED_IDS.includes(p.num);
+
             return `
                 <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 flex flex-col justify-between space-y-3">
                     <div class="flex justify-between items-start">
@@ -274,10 +314,17 @@ const UI = {
                             <input type="checkbox" data-dex="${p.num}" data-field="caughtNormal" ${p.caughtNormal ? 'checked' : ''} class="dex-cb w-3.5 h-3.5 rounded bg-slate-900 border-slate-700 text-indigo-500 cursor-pointer">
                             <span class="ml-2">Normal</span>
                         </label>
+                        ${isShinyLocked ? `
+                        <div class="flex items-center text-[11px] font-medium text-slate-500 cursor-not-allowed" title="Shiny Locked by Game Freak">
+                            <span class="w-3.5 h-3.5 flex items-center justify-center text-[10px]">🔒</span>
+                            <span class="ml-2">Shiny Locked</span>
+                        </div>
+                        ` : `
                         <label class="flex items-center text-[11px] font-medium text-amber-400 cursor-pointer">
                             <input type="checkbox" data-dex="${p.num}" data-field="caughtShiny" ${p.caughtShiny ? 'checked' : ''} class="dex-cb w-3.5 h-3.5 rounded bg-slate-900 border-slate-700 text-amber-500 cursor-pointer">
                             <span class="ml-2">✨ Shiny</span>
                         </label>
+                        `}
                     </div>
 
                     ${p.hasRegional ? `
@@ -286,10 +333,17 @@ const UI = {
                             <input type="checkbox" data-dex="${p.num}" data-field="caughtRegionalNormal" ${p.caughtRegionalNormal ? 'checked' : ''} class="dex-cb w-3.5 h-3.5 rounded bg-slate-900 border-slate-700 text-indigo-500 cursor-pointer">
                             <span class="ml-2">Reg Normal</span>
                         </label>
+                        ${isShinyLocked ? `
+                        <div class="flex items-center text-[11px] font-medium text-slate-500 cursor-not-allowed" title="Shiny Locked by Game Freak">
+                            <span class="w-3.5 h-3.5 flex items-center justify-center text-[10px]">🔒</span>
+                            <span class="ml-2">Reg Locked</span>
+                        </div>
+                        ` : `
                         <label class="flex items-center text-[11px] font-medium text-amber-400 cursor-pointer">
                             <input type="checkbox" data-dex="${p.num}" data-field="caughtRegionalShiny" ${p.caughtRegionalShiny ? 'checked' : ''} class="dex-cb w-3.5 h-3.5 rounded bg-slate-900 border-slate-700 text-amber-500 cursor-pointer">
                             <span class="ml-2">✨ Reg Shiny</span>
                         </label>
+                        `}
                     </div>
                     ` : ''}
 
@@ -325,7 +379,8 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.addEventListener('click', () => {
             state.currentTab = btn.dataset.tab;
             document.querySelectorAll('[role="tabpanel"]').forEach(p => p.classList.add('hidden'));
-            document.getElementById(`tab-content-${state.currentTab}`).classList.remove('hidden');
+            const targetContent = document.getElementById(`tab-content-${state.currentTab}`);
+            if (targetContent) targetContent.classList.remove('hidden');
             
             document.querySelectorAll('nav button').forEach(b => {
                 b.classList.remove('bg-indigo-600', 'text-white');
@@ -336,33 +391,41 @@ document.addEventListener('DOMContentLoaded', () => {
             
             if (state.currentTab === 'missions') UI.renderMissions();
             if (state.currentTab === 'dex') UI.renderDex();
-            document.getElementById('mobile-nav').classList.add('hidden');
+            
+            const mobileNav = document.getElementById('mobile-nav');
+            if (mobileNav) mobileNav.classList.add('hidden');
         });
     });
 
     // MISSIONS
-    document.getElementById('btn-create-mission').addEventListener('click', () => document.getElementById('create-mission-panel').classList.toggle('hidden'));
-    document.getElementById('btn-cancel-mission').addEventListener('click', () => document.getElementById('create-mission-panel').classList.add('hidden'));
+    const createBtn = document.getElementById('btn-create-mission');
+    const cancelBtn = document.getElementById('btn-cancel-mission');
+    const missionForm = document.getElementById('new-mission-form');
     
-    document.getElementById('new-mission-form').addEventListener('submit', (e) => {
-        e.preventDefault();
-        state.missions.unshift({
-            id: `m_${Date.now()}`,
-            title: document.getElementById('new-m-title').value,
-            game: document.getElementById('new-m-game').value,
-            platform: document.getElementById('new-m-platform').value,
-            tag: document.getElementById('new-m-tag').value,
-            emoji: document.getElementById('new-m-emoji').value,
-            desc: document.getElementById('new-m-desc').value,
-            color: document.getElementById('new-m-color').value,
-            tasks: document.getElementById('new-m-tasks').value.split('\n').filter(t=>t.trim()).map((t, i) => ({ id: `t_${i}`, text: t, checked: false }))
+    if (createBtn) createBtn.addEventListener('click', () => document.getElementById('create-mission-panel').classList.toggle('hidden'));
+    if (cancelBtn) cancelBtn.addEventListener('click', () => document.getElementById('create-mission-panel').classList.add('hidden'));
+    
+    if (missionForm) {
+        missionForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            state.missions.unshift({
+                id: `m_${Date.now()}`,
+                title: document.getElementById('new-m-title').value,
+                game: document.getElementById('new-m-game').value,
+                platform: document.getElementById('new-m-platform').value,
+                tag: document.getElementById('new-m-tag').value,
+                emoji: document.getElementById('new-m-emoji').value,
+                desc: document.getElementById('new-m-desc').value,
+                color: document.getElementById('new-m-color').value,
+                tasks: document.getElementById('new-m-tasks').value.split('\n').filter(t=>t.trim()).map((t, i) => ({ id: `t_${i}`, text: t, checked: false }))
+            });
+            Storage.save();
+            UI.renderMissions();
+            document.getElementById('create-mission-panel').classList.add('hidden');
+            e.target.reset();
+            triggerToast('Mission created!');
         });
-        Storage.save();
-        UI.renderMissions();
-        document.getElementById('create-mission-panel').classList.add('hidden');
-        e.target.reset();
-        triggerToast('Mission created!');
-    });
+    }
 
     document.querySelectorAll('.mission-filter-btn').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -373,103 +436,133 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    document.getElementById('missions-grid').addEventListener('change', (e) => {
-        if (e.target.classList.contains('mission-checkbox')) {
-            const m = state.missions.find(ms => ms.id === e.target.dataset.mission);
-            const t = m.tasks.find(ts => ts.id === e.target.dataset.task);
-            t.checked = e.target.checked;
-            Storage.save();
-            UI.renderMissions();
-        }
-    });
+    const missionsGrid = document.getElementById('missions-grid');
+    if (missionsGrid) {
+        missionsGrid.addEventListener('change', (e) => {
+            if (e.target.classList.contains('mission-checkbox')) {
+                const m = state.missions.find(ms => ms.id === e.target.dataset.mission);
+                const t = m.tasks.find(ts => ts.id === e.target.dataset.task);
+                t.checked = e.target.checked;
+                Storage.save();
+                UI.renderMissions();
+            }
+        });
 
-    document.getElementById('missions-grid').addEventListener('click', (e) => {
-        if (e.target.dataset.deleteMission) {
-            state.missions = state.missions.filter(m => m.id !== e.target.dataset.deleteMission);
-            Storage.save();
-            UI.renderMissions();
-            triggerToast('Mission deleted.', 'rose');
-        }
-    });
+        missionsGrid.addEventListener('click', (e) => {
+            if (e.target.dataset.deleteMission) {
+                state.missions = state.missions.filter(m => m.id !== e.target.dataset.deleteMission);
+                Storage.save();
+                UI.renderMissions();
+                triggerToast('Mission deleted.', 'rose');
+            }
+        });
+    }
 
     // DEX
-    document.getElementById('dex-search').addEventListener('input', debounce(e => { state.dexSearch = e.target.value; state.currentPage = 1; UI.renderDex(); }, 250));
-    document.getElementById('dex-gen-filter').addEventListener('change', e => { state.dexGen = e.target.value; state.currentPage = 1; UI.renderDex(); });
-    document.getElementById('dex-state-filter').addEventListener('change', e => { state.dexState = e.target.value; state.currentPage = 1; UI.renderDex(); });
-    document.getElementById('btn-prev-page').addEventListener('click', () => { state.currentPage--; UI.renderDex(); });
-    document.getElementById('btn-next-page').addEventListener('click', () => { state.currentPage++; UI.renderDex(); });
+    const dexSearch = document.getElementById('dex-search');
+    const dexGenFilter = document.getElementById('dex-gen-filter');
+    const dexStateFilter = document.getElementById('dex-state-filter');
+    const btnPrev = document.getElementById('btn-prev-page');
+    const btnNext = document.getElementById('btn-next-page');
+    const dexGrid = document.getElementById('dex-grid');
 
-    document.getElementById('dex-grid').addEventListener('change', (e) => {
-        if (e.target.classList.contains('dex-cb')) {
-            const p = state.pokemon.find(x => x.num === parseInt(e.target.dataset.dex));
-            p[e.target.dataset.field] = e.target.checked;
-            Storage.save();
-            UI.renderDex(); // Update stats
-        }
-        if (e.target.classList.contains('form-cb')) {
-            const p = state.pokemon.find(x => x.num === parseInt(e.target.dataset.dex));
-            if (!p.caughtForms) p.caughtForms = [];
-            if (e.target.checked) p.caughtForms.push(e.target.dataset.form);
-            else p.caughtForms = p.caughtForms.filter(f => f !== e.target.dataset.form);
-            Storage.save();
-            UI.renderDex();
-        }
-    });
+    if (dexSearch) dexSearch.addEventListener('input', debounce(e => { state.dexSearch = e.target.value; state.currentPage = 1; UI.renderDex(); }, 250));
+    if (dexGenFilter) dexGenFilter.addEventListener('change', e => { state.dexGen = e.target.value; state.currentPage = 1; UI.renderDex(); });
+    if (dexStateFilter) dexStateFilter.addEventListener('change', e => { state.dexState = e.target.value; state.currentPage = 1; UI.renderDex(); });
+    if (btnPrev) btnPrev.addEventListener('click', () => { state.currentPage--; UI.renderDex(); });
+    if (btnNext) btnNext.addEventListener('click', () => { state.currentPage++; UI.renderDex(); });
+
+    if (dexGrid) {
+        dexGrid.addEventListener('change', (e) => {
+            if (e.target.classList.contains('dex-cb')) {
+                const p = state.pokemon.find(x => x.num === parseInt(e.target.dataset.dex));
+                p[e.target.dataset.field] = e.target.checked;
+                Storage.save();
+                UI.renderDex(); // Update stats
+            }
+            if (e.target.classList.contains('form-cb')) {
+                const p = state.pokemon.find(x => x.num === parseInt(e.target.dataset.dex));
+                if (!p.caughtForms) p.caughtForms = [];
+                if (e.target.checked) p.caughtForms.push(e.target.dataset.form);
+                else p.caughtForms = p.caughtForms.filter(f => f !== e.target.dataset.form);
+                Storage.save();
+                UI.renderDex();
+            }
+        });
+    }
 
     // POKEAPI SYNC
-    document.getElementById('api-sync-btn').addEventListener('click', async () => {
-        const wrap = document.getElementById('api-progress-wrapper');
-        const bar = document.getElementById('api-progress-bar');
-        wrap.classList.remove('hidden');
-        bar.style.width = '30%';
-        try {
-            const res = await fetch(`${POKEAPI_BASE}?limit=1025`);
-            const data = await res.json();
-            bar.style.width = '70%';
-            data.results.forEach((item, idx) => {
-                const p = state.pokemon.find(x => x.num === idx + 1);
-                if (p && p.name.startsWith("Species #")) p.name = item.name.replace(/-/g, ' ');
-            });
-            bar.style.width = '100%';
-            Storage.save();
-            UI.renderDex();
-            triggerToast('Pokédex data synced!');
-            setTimeout(() => wrap.classList.add('hidden'), 1000);
-        } catch(err) {
-            triggerToast('API connection failed.', 'rose');
-            wrap.classList.add('hidden');
-        }
-    });
+    const apiBtn = document.getElementById('api-sync-btn');
+    if (apiBtn) {
+        apiBtn.addEventListener('click', async () => {
+            const wrap = document.getElementById('api-progress-wrapper');
+            const bar = document.getElementById('api-progress-bar');
+            if (wrap) wrap.classList.remove('hidden');
+            if (bar) bar.style.width = '30%';
+            try {
+                const res = await fetch(`${POKEAPI_BASE}?limit=1025`);
+                const data = await res.json();
+                if (bar) bar.style.width = '70%';
+                data.results.forEach((item, idx) => {
+                    const p = state.pokemon.find(x => x.num === idx + 1);
+                    if (p && p.name.startsWith("Species #")) p.name = item.name.replace(/-/g, ' ');
+                });
+                if (bar) bar.style.width = '100%';
+                Storage.save();
+                UI.renderDex();
+                triggerToast('Pokédex data synced!');
+                setTimeout(() => { if (wrap) wrap.classList.add('hidden'); }, 1000);
+            } catch(err) {
+                triggerToast('API connection failed.', 'rose');
+                if (wrap) wrap.classList.add('hidden');
+            }
+        });
+    }
 
     // DATA MANAGMENT
-    document.getElementById('btn-copy-export').addEventListener('click', () => {
-        document.getElementById('sync-export-area').select();
-        document.execCommand('copy');
-        triggerToast('Copied to clipboard!');
-    });
-    
-    document.getElementById('btn-import-sync').addEventListener('click', () => {
-        try {
-            const json = JSON.parse(decodeURIComponent(escape(atob(document.getElementById('sync-import-area').value))));
-            if (json.pokemon) state.pokemon = json.pokemon;
-            if (json.missions) state.missions = json.missions;
-            Storage.save();
-            UI.renderMissions();
-            UI.renderDex();
-            triggerToast('Data imported successfully!', 'emerald');
-            document.getElementById('sync-import-area').value = '';
-        } catch(e) {
-            triggerToast('Invalid import string.', 'rose');
-        }
-    });
+    const btnCopy = document.getElementById('btn-copy-export');
+    const btnImport = document.getElementById('btn-import-sync');
+    const btnClear = document.getElementById('btn-clear-data');
 
-    document.getElementById('btn-clear-data').addEventListener('click', () => {
-        if(confirm("Wipe all tracking data? This cannot be undone.")) {
-            localStorage.removeItem(STORAGE_KEY);
-            Storage.load();
-            UI.renderMissions();
-            UI.renderDex();
-            triggerToast("Factory reset complete.", "rose");
-        }
-    });
+    if (btnCopy) {
+        btnCopy.addEventListener('click', () => {
+            const exportArea = document.getElementById('sync-export-area');
+            if (exportArea) {
+                exportArea.select();
+                document.execCommand('copy');
+                triggerToast('Copied to clipboard!');
+            }
+        });
+    }
+    
+    if (btnImport) {
+        btnImport.addEventListener('click', () => {
+            try {
+                const importArea = document.getElementById('sync-import-area');
+                if (!importArea || !importArea.value) return;
+                const json = JSON.parse(decodeURIComponent(escape(atob(importArea.value))));
+                if (json.pokemon) state.pokemon = json.pokemon;
+                if (json.missions) state.missions = json.missions;
+                Storage.save();
+                UI.renderMissions();
+                UI.renderDex();
+                triggerToast('Data imported successfully!', 'emerald');
+                importArea.value = '';
+            } catch(e) {
+                triggerToast('Invalid import string.', 'rose');
+            }
+        });
+    }
+
+    if (btnClear) {
+        btnClear.addEventListener('click', () => {
+            if(confirm("Wipe all tracking data? This cannot be undone.")) {
+                localStorage.removeItem(STORAGE_KEY);
+                Storage.load();
+                UI.renderMissions();
+                UI.renderDex();
+                triggerToast("Factory reset complete.", "rose");
+            }
+        });
+    }
 });
