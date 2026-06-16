@@ -2,121 +2,141 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PokeQuest Master Dashboard</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#0b0f19">
+    <meta name="description" content="PokeQuest Living Dex - Offline Pokémon campaign tracker and Pokédex manager">
+    
+    <!-- PWA Configuration -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="PokeQuest">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect fill='%230b0f19' width='180' height='180'/><text x='50%' y='50%' font-size='80' text-anchor='middle' dominant-baseline='central' font-family='system-ui'>🌟</text></svg>">
+    
+    <title>PokeQuest Living Dex</title>
+    <link rel="stylesheet" href="styles.css">
+    
+    <!-- Fallback for fonts (system fonts as primary) -->
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #0b0f19;
-        }
-        /* Custom Scrollbar for sleek aesthetic */
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #0f172a;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #334155;
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #475569;
-        }
-        /* Hide scrollbars for simple filter strips */
-        .scrollbar-none::-webkit-scrollbar {
-            display: none;
-        }
-        .scrollbar-none {
-            -ms-overflow-style: none;  /* IE and Edge */
-            scrollbar-width: none;  /* Firefox */
+        @font-face {
+            font-family: 'Inter';
+            font-style: normal;
+            font-weight: 400;
+            font-display: swap;
+            src: local('system-ui'), local('-apple-system'), local('Segoe UI'), local('Helvetica Neue'), sans-serif;
         }
     </style>
 </head>
-<body class="text-slate-100 min-h-screen flex flex-col selection:bg-indigo-500 selection:text-white">
+<body class="text-slate-100 bg-slate-950 min-h-screen flex flex-col selection:bg-indigo-500 selection:text-white">
 
+    <!-- Header with Mobile Navigation -->
     <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-40 transition-all">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-            <div class="flex items-center space-x-3">
-                <div class="h-10 w-10 rounded-xl bg-gradient-to-tr from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+        <div class="w-full px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3 flex-1 min-w-0">
+                <div class="h-10 w-10 flex-shrink-0 rounded-xl bg-gradient-to-tr from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
                     <span class="text-xl">🌟</span>
                 </div>
-                <div>
-                    <h1 class="text-lg font-extrabold tracking-tight bg-gradient-to-r from-white via-indigo-200 to-purple-400 bg-clip-text text-transparent">PokeQuest Living Dex</h1>
-                    <p class="text-[10px] text-indigo-400 font-semibold uppercase tracking-wider">Tactical Campaign Companion</p>
+                <div class="min-w-0">
+                    <h1 class="text-sm sm:text-lg font-extrabold tracking-tight bg-gradient-to-r from-white via-indigo-200 to-purple-400 bg-clip-text text-transparent truncate">PokeQuest Living Dex</h1>
+                    <p class="text-[10px] text-indigo-400 font-semibold uppercase tracking-wider hidden sm:block">Tactical Campaign Companion</p>
                 </div>
             </div>
             
-            <nav class="flex space-x-1 bg-slate-950 p-1 rounded-xl border border-slate-800/80" role="tablist" aria-label="Main navigation">
-                <button data-tab="missions" id="tab-btn-missions" class="px-4 py-1.5 text-xs font-semibold rounded-lg transition-all duration-200 bg-indigo-600 text-white shadow-md shadow-indigo-600/10" role="tab" aria-selected="true" aria-controls="tab-content-missions">
-                    🗺️ Missions
+            <!-- Mobile Menu Toggle -->
+            <button id="nav-toggle" class="md:hidden p-2 rounded-lg hover:bg-slate-800 transition ml-2 flex-shrink-0" aria-label="Toggle navigation" aria-expanded="false">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+            </button>
+
+            <!-- Desktop Navigation -->
+            <nav id="nav-menu" class="hidden md:flex space-x-1 bg-slate-950 p-1 rounded-xl border border-slate-800/80" role="tablist" aria-label="Main navigation">
+                <button data-tab="missions" id="tab-btn-missions" class="px-4 py-1.5 text-xs font-semibold rounded-lg transition-all duration-200 bg-indigo-600 text-white shadow-md shadow-indigo-600/20" role="tab" aria-selected="true" aria-controls="tab-content-missions">
+                    🗺️ <span class="hidden sm:inline">Missions</span>
                 </button>
                 <button data-tab="dex" id="tab-btn-dex" class="px-4 py-1.5 text-xs font-semibold rounded-lg transition-all duration-200 text-slate-400 hover:text-white" role="tab" aria-selected="false" aria-controls="tab-content-dex">
-                    🗃️ Dex Registry
+                    🗃️ <span class="hidden sm:inline">Dex</span>
                 </button>
-                <button data-tab="sync" id="tab-btn-sync" class="px-4 py-1.5 text-xs font-semibold rounded-lg transition-all duration-200 text-slate-400 hover:text-white" role="tab" aria-selected="false" aria-controls="tab-content-sync">
-                    🔗 Gemini Sync
+                <button data-tab="settings" id="tab-btn-settings" class="px-4 py-1.5 text-xs font-semibold rounded-lg transition-all duration-200 text-slate-400 hover:text-white" role="tab" aria-selected="false" aria-controls="tab-content-settings">
+                    ⚙️ <span class="hidden sm:inline">Settings</span>
                 </button>
             </nav>
         </div>
+
+        <!-- Mobile Navigation Menu -->
+        <nav id="mobile-nav" class="hidden md:hidden border-t border-slate-800 bg-slate-900 p-3 space-y-2">
+            <button data-tab="missions" id="tab-btn-missions-mobile" class="w-full text-left px-4 py-2.5 text-sm font-semibold rounded-lg bg-indigo-600 text-white transition-all" role="tab" aria-selected="true" aria-controls="tab-content-missions">
+                🗺️ Missions
+            </button>
+            <button data-tab="dex" id="tab-btn-dex-mobile" class="w-full text-left px-4 py-2.5 text-sm font-semibold rounded-lg text-slate-400 hover:text-white bg-slate-950 transition-all" role="tab" aria-selected="false" aria-controls="tab-content-dex">
+                🗃️ Pokédex
+            </button>
+            <button data-tab="settings" id="tab-btn-settings-mobile" class="w-full text-left px-4 py-2.5 text-sm font-semibold rounded-lg text-slate-400 hover:text-white bg-slate-950 transition-all" role="tab" aria-selected="false" aria-controls="tab-content-settings">
+                ⚙️ Settings
+            </button>
+        </nav>
     </header>
 
-    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Main Content -->
+    <main class="flex-grow w-full px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         
-        <section id="tab-content-missions" class="space-y-8" role="tabpanel" aria-labelledby="tab-btn-missions">
-            <div class="bg-gradient-to-r from-slate-900 to-indigo-950/40 p-6 rounded-2xl border border-indigo-500/10 shadow-xl flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                <div>
-                    <h2 class="text-xl font-bold mb-1 text-white flex items-center gap-2">
-                        <span>🧭</span> Campaign Dashboard
+        <!-- MISSIONS TAB -->
+        <section id="tab-content-missions" class="space-y-6 sm:space-y-8" role="tabpanel" aria-labelledby="tab-btn-missions">
+            <!-- Campaign Dashboard Header -->
+            <div class="bg-gradient-to-r from-slate-900 to-indigo-950/40 p-4 sm:p-6 rounded-2xl border border-indigo-500/10 shadow-xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div class="min-w-0">
+                    <h2 class="text-lg sm:text-xl font-bold mb-1 sm:mb-2 text-white flex items-center gap-2">
+                        <span>🧭</span> <span>Campaign Dashboard</span>
                     </h2>
-                    <p class="text-xs text-slate-400 leading-relaxed max-w-3xl">
+                    <p class="text-xs sm:text-sm text-slate-400 leading-relaxed">
                         Welcome to your master campaign blueprint. This tracker monitors operations across your entire device arsenal. Select target game to filter campaigns.
                     </p>
                 </div>
-                <button id="btn-create-mission" class="shrink-0 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs px-5 py-3 rounded-xl transition duration-200 shadow-md shadow-indigo-600/10" aria-label="Create Custom Mission">
-                    ➕ Create Custom Mission
+                <button id="btn-create-mission" class="shrink-0 bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white font-bold text-xs px-4 sm:px-5 py-2.5 sm:py-3 rounded-xl transition duration-200 shadow-md shadow-indigo-600/20 w-full sm:w-auto">
+                    ➕ Create Mission
                 </button>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 bg-slate-900/40 border border-slate-800/80 p-5 rounded-2xl">
-                <div class="md:col-span-1 flex flex-col justify-between space-y-4">
+            <!-- Progress Overview -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 bg-slate-900/40 border border-slate-800/80 p-4 sm:p-6 rounded-2xl">
+                <div class="lg:col-span-1 flex flex-col justify-between space-y-4">
                     <div>
                         <h3 class="text-xs font-extrabold tracking-wider text-slate-400 uppercase">Master Campaign Progress</h3>
                         <p class="text-[10px] text-indigo-400 font-semibold mt-0.5 font-mono">GLOBAL SYNCHRONIZATION</p>
                     </div>
                     <div>
-                        <div class="flex justify-between items-baseline mb-1.5">
-                            <span id="overall-progress-text" class="text-3xl font-extrabold text-white font-mono">0%</span>
+                        <div class="flex justify-between items-baseline mb-2">
+                            <span id="overall-progress-text" class="text-3xl sm:text-4xl font-extrabold text-white font-mono">0%</span>
                             <span class="text-[10px] font-bold text-indigo-400 uppercase">Completed</span>
                         </div>
-                        <div class="w-full bg-slate-950 h-3.5 rounded-full overflow-hidden border border-slate-800" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Overall campaign progress">
+                        <div class="w-full bg-slate-950 h-3.5 rounded-full overflow-hidden border border-slate-800" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Overall progress">
                             <div id="overall-progress-bar" class="h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 shadow-lg shadow-indigo-500/20 transition-all duration-500 w-0"></div>
                         </div>
                     </div>
                 </div>
-                <div class="md:col-span-2 space-y-3">
+                <div class="lg:col-span-2 space-y-3">
                     <h3 class="text-xs font-extrabold tracking-wider text-slate-400 uppercase">Active Hardware Channels</h3>
                     <div id="game-progress-grid" class="grid grid-cols-2 sm:grid-cols-3 gap-3" role="region" aria-label="Game progress overview">
-                        </div>
+                        <!-- Populated by JavaScript -->
+                    </div>
                 </div>
             </div>
 
-            <div id="create-mission-panel" class="hidden bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
-                <div class="border-b border-slate-800 pb-3 flex items-center justify-between">
-                    <h3 class="text-sm font-bold text-white flex items-center gap-2">⚔️ Forge a Custom Quest Route</h3>
-                    <span class="text-[10px] text-indigo-400 font-semibold uppercase tracking-wider">Campaign Sync Integration</span>
+            <!-- Create Mission Panel -->
+            <div id="create-mission-panel" class="hidden bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-6 space-y-4">
+                <div class="border-b border-slate-800 pb-3 flex items-center justify-between gap-2">
+                    <h3 class="text-sm font-bold text-white flex items-center gap-2">⚔️ Forge Quest</h3>
+                    <span class="text-[10px] text-indigo-400 font-semibold uppercase tracking-wider hidden sm:inline">Campaign Sync</span>
                 </div>
-                <form id="new-mission-form" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <form id="new-mission-form" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div class="space-y-1.5">
                         <label for="new-m-title" class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Mission Title</label>
-                        <input type="text" id="new-m-title" required placeholder="e.g., Ribbon Hunting Phase" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-indigo-500 transition" aria-label="Mission title input" aria-required="true">
+                        <input type="text" id="new-m-title" required placeholder="e.g., Ribbon Hunting Phase" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-indigo-500 transition">
                     </div>
                     <div class="space-y-1.5">
-                        <label for="new-m-game" class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Associated Target Game</label>
-                        <select id="new-m-game" class="w-full px-3 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-indigo-500 transition cursor-pointer" aria-label="Target game selection">
+                        <label for="new-m-game" class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Target Game</label>
+                        <select id="new-m-game" required class="w-full px-3 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-indigo-500 transition">
+                            <option value="">Select Game...</option>
                             <option value="Emerald">🧪 Emerald</option>
                             <option value="Crystal">🧅 Crystal</option>
                             <option value="Platinum">💫 Platinum</option>
@@ -129,16 +149,21 @@
                         </select>
                     </div>
                     <div class="space-y-1.5">
-                        <label for="new-m-platform" class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Specific Hardware Version</label>
-                        <input type="text" id="new-m-platform" required placeholder="e.g., GBA (DS Lite Slot)" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-indigo-500 transition" aria-label="Hardware platform input" aria-required="true">
+                        <label for="new-m-platform" class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Hardware Version</label>
+                        <input type="text" id="new-m-platform" required placeholder="e.g., GBA (DS Lite Slot)" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-indigo-500 transition">
                     </div>
                     <div class="space-y-1.5">
-                        <label for="new-m-tag" class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Badge Label text</label>
-                        <input type="text" id="new-m-tag" required placeholder="e.g., Custom Hunt" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-indigo-500 transition" aria-label="Badge label input" aria-required="true">
+                        <label for="new-m-tag" class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Badge Label</label>
+                        <input type="text" id="new-m-tag" required placeholder="e.g., Custom Hunt" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-indigo-500 transition">
                     </div>
                     <div class="space-y-1.5">
-                        <label for="new-m-color" class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Accent Color Theme</label>
-                        <select id="m-color-dropdown" class="w-full px-3 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-indigo-500 transition cursor-pointer" aria-label="Color theme selection">
+                        <label for="new-m-emoji" class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Icon Emoji</label>
+                        <input type="text" id="new-m-emoji" required placeholder="e.g., 🎗️" maxlength="2" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-indigo-500 transition">
+                    </div>
+                    <div class="space-y-1.5">
+                        <label for="new-m-color" class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Color Theme</label>
+                        <select id="new-m-color" required class="w-full px-3 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-indigo-500 transition">
+                            <option value="">Select Color...</option>
                             <option value="indigo">💜 Indigo</option>
                             <option value="emerald">💚 Emerald</option>
                             <option value="cyan">💙 Cyan</option>
@@ -147,35 +172,117 @@
                             <option value="rose">❤️ Rose</option>
                         </select>
                     </div>
-                    <div class="space-y-1.5">
-                        <label for="new-m-emoji" class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Target Emoji Icon</label>
-                        <input type="text" id="new-m-emoji" required placeholder="e.g., 🎗️" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-indigo-500 transition" aria-label="Emoji icon input" aria-required="true">
+                    <div class="space-y-1.5 sm:col-span-2">
+                        <label for="new-m-desc" class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Objective Description</label>
+                        <textarea id="new-m-desc" required placeholder="Describe this custom campaign..." class="w-full h-20 px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-indigo-500 transition resize-none"></textarea>
                     </div>
-                    <div class="space-y-1.5 md:col-span-2">
-                        <label for="new-m-desc" class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Mission Objective Description</label>
-                        <textarea id="new-m-desc" required placeholder="Describe what makes this custom campaign unique..." class="w-full h-20 px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-indigo-500 transition resize-none" aria-label="Mission description input" aria-required="true"></textarea>
+                    <div class="space-y-1.5 sm:col-span-2">
+                        <label for="new-m-tasks" class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Task Checklists</label>
+                        <textarea id="new-m-tasks" required placeholder="One task per line" class="w-full h-24 px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-indigo-500 transition resize-none"></textarea>
                     </div>
-                    <div class="space-y-1.5 md:col-span-2">
-                        <label for="new-m-tasks" class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Task Checklists (Press Enter for new line)</label>
-                        <textarea id="new-m-tasks" required placeholder="Item task checklist step 1&#10;Item task checklist step 2&#10;Item task checklist step 3" class="w-full h-24 px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-indigo-500 transition resize-none" aria-label="Task checklist input" aria-required="true"></textarea>
-                    </div>
-                    <div class="md:col-span-2 flex justify-end gap-3 pt-2">
-                        <button type="button" id="btn-cancel-mission" class="px-4 py-2 bg-slate-950 hover:bg-slate-900 border border-slate-800 rounded-xl text-xs font-semibold text-slate-300 transition" aria-label="Cancel mission creation">
+                    <div class="sm:col-span-2 flex justify-end gap-3 pt-2">
+                        <button type="button" id="btn-cancel-mission" class="px-4 py-2.5 bg-slate-950 hover:bg-slate-900 border border-slate-800 rounded-xl text-xs font-semibold text-slate-300 transition">
                             Cancel
                         </button>
-                        <button type="submit" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-500 rounded-xl text-xs font-bold text-white transition shadow-lg shadow-emerald-600/10" aria-label="Publish the created mission">
+                        <button type="submit" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 rounded-xl text-xs font-bold text-white transition shadow-lg shadow-emerald-600/20">
                             Publish Mission
                         </button>
                     </div>
                 </form>
             </div>
 
-            <div class="border-b border-slate-800/60 pb-3 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-                <span class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-                    <span>⚡</span> Filter Campaigns:
+            <!-- Filter Section -->
+            <div class="border-t border-slate-800/60 pt-4 sm:pt-6">
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5 mb-3">
+                    <span>⚡</span> Filter Campaigns
                 </span>
-                <div class="flex items-center space-x-2 overflow-x-auto pb-2 scrollbar-none max-w-full" role="group" aria-label="Game filter buttons">
+                <div class="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none" role="group" aria-label="Game filter buttons">
                     <button class="mission-filter-btn px-3.5 py-1.5 bg-indigo-600 text-white rounded-lg text-xs font-bold whitespace-nowrap transition-all" data-filter="all" aria-pressed="true">All Games</button>
-                    <button class="mission-filter-btn px-3 py-1.5 bg-slate-950 text-slate-400 hover:text-white rounded-lg text-xs font-bold whitespace-nowrap transition-all" data-filter="Emerald" aria-pressed="false">🧪 Emerald</button>
-                    <button class="mission-filter-btn px-3 py-1.5 bg-slate-950 text-slate-400 hover:text-white rounded-lg text-xs font-bold whitespace-nowrap transition-all" data-filter="Crystal" aria-pressed="false">🧅 Crystal</button>
-                    <button class="mission-filter-btn px-3 py-1.5 bg-slate-950 text-slate-400 hover:text-white rounded-lg
+                    <button class="mission-filter-btn px-3 py-1.5 bg-slate-950 text-slate-400 hover:text-white rounded-lg text-xs font-bold whitespace-nowrap transition-all" data-filter="Emerald">Emerald</button>
+                    <button class="mission-filter-btn px-3 py-1.5 bg-slate-950 text-slate-400 hover:text-white rounded-lg text-xs font-bold whitespace-nowrap transition-all" data-filter="Crystal">Crystal</button>
+                    <button class="mission-filter-btn px-3 py-1.5 bg-slate-950 text-slate-400 hover:text-white rounded-lg text-xs font-bold whitespace-nowrap transition-all" data-filter="Platinum">Platinum</button>
+                    <button class="mission-filter-btn px-3 py-1.5 bg-slate-950 text-slate-400 hover:text-white rounded-lg text-xs font-bold whitespace-nowrap transition-all" data-filter="Other">Custom</button>
+                </div>
+            </div>
+
+            <!-- Missions List -->
+            <div id="missions-list" class="space-y-3">
+                <!-- Populated by JavaScript -->
+            </div>
+        </section>
+
+        <!-- DEX TAB -->
+        <section id="tab-content-dex" class="hidden space-y-6 sm:space-y-8" role="tabpanel" aria-labelledby="tab-btn-dex">
+            <div class="bg-gradient-to-r from-slate-900 to-purple-950/40 p-4 sm:p-6 rounded-2xl border border-purple-500/10">
+                <h2 class="text-lg sm:text-xl font-bold text-white mb-2">🗃️ Pokédex Registry</h2>
+                <p class="text-xs sm:text-sm text-slate-400">Track all Pokémon across your campaigns.</p>
+            </div>
+            <div id="dex-content" class="bg-slate-900/40 border border-slate-800/80 p-4 sm:p-6 rounded-2xl text-center text-slate-400">
+                <p class="text-sm">Pokédex features coming soon...</p>
+            </div>
+        </section>
+
+        <!-- SETTINGS TAB -->
+        <section id="tab-content-settings" class="hidden space-y-6 sm:space-y-8" role="tabpanel" aria-labelledby="tab-btn-settings">
+            <div class="bg-gradient-to-r from-slate-900 to-amber-950/40 p-4 sm:p-6 rounded-2xl border border-amber-500/10">
+                <h2 class="text-lg sm:text-xl font-bold text-white mb-2">⚙️ Settings</h2>
+                <p class="text-xs sm:text-sm text-slate-400">Manage your data and preferences.</p>
+            </div>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                <!-- Data Management -->
+                <div class="bg-slate-900/40 border border-slate-800/80 p-4 sm:p-6 rounded-2xl">
+                    <h3 class="text-sm font-bold text-white mb-4">💾 Data Management</h3>
+                    <div class="space-y-2">
+                        <button id="btn-export-data" class="w-full px-4 py-2.5 bg-blue-600 hover:bg-blue-500 active:bg-blue-700 rounded-lg text-xs font-semibold text-white transition">
+                            📥 Export Data
+                        </button>
+                        <button id="btn-import-data" class="w-full px-4 py-2.5 bg-blue-600 hover:bg-blue-500 active:bg-blue-700 rounded-lg text-xs font-semibold text-white transition">
+                            📤 Import Data
+                        </button>
+                        <button id="btn-clear-data" class="w-full px-4 py-2.5 bg-rose-600 hover:bg-rose-500 active:bg-rose-700 rounded-lg text-xs font-semibold text-white transition">
+                            🗑️ Clear All Data
+                        </button>
+                    </div>
+                </div>
+
+                <!-- App Info -->
+                <div class="bg-slate-900/40 border border-slate-800/80 p-4 sm:p-6 rounded-2xl">
+                    <h3 class="text-sm font-bold text-white mb-4">ℹ️ App Information</h3>
+                    <div class="space-y-2 text-xs text-slate-400">
+                        <p><strong>Version:</strong> <span id="app-version">1.0.0</span></p>
+                        <p><strong>Status:</strong> <span id="offline-status" class="text-amber-400">Checking...</span></p>
+                        <p><strong>Storage Used:</strong> <span id="storage-used">0 KB</span></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Offline Indicator -->
+    <div id="offline-banner" class="hidden fixed bottom-0 left-0 right-0 bg-amber-900/90 border-t border-amber-700 p-3 text-center text-xs text-amber-100 z-30">
+        📡 You're offline. Changes are saved locally and will sync when online.
+    </div>
+
+    <noscript>
+        <div style="padding: 20px; text-align: center; color: #ccc; background: #0b0f19; font-family: system-ui, sans-serif;">
+            <p>⚠️ PokeQuest requires JavaScript to run. Please enable JavaScript in your browser settings.</p>
+        </div>
+    </noscript>
+
+    <!-- Register Service Worker -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(reg => console.log('✅ Service Worker registered'))
+                    .catch(err => console.log('❌ Service Worker registration failed:', err));
+            });
+        }
+    </script>
+
+    <!-- Main Application -->
+    <script src="app.js"></script>
+</body>
+</html>
