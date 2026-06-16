@@ -8,6 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <!-- STYLE CHUNK: Custom Scrollbars and Layout Fixes -->
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -28,11 +29,18 @@
         ::-webkit-scrollbar-thumb:hover {
             background: #475569;
         }
+        /* Hide scrollbars for simple filter strips */
+        .scrollbar-none::-webkit-scrollbar {
+            display: none;
+        }
+        .scrollbar-none {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
     </style>
 </head>
 <body class="text-slate-100 min-h-screen flex flex-col selection:bg-indigo-500 selection:text-white">
 
-    <!-- Top Navigation Header -->
     <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-40 transition-all">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
             <div class="flex items-center space-x-3">
@@ -40,7 +48,7 @@
                     <span class="text-xl">🌟</span>
                 </div>
                 <div>
-                    <h1 class="text-lg font-extrabold tracking-tight bg-gradient-to-r from-white via-indigo-200 to-purple-400 bg-clip-text text-transparent">PokeQuest Master Living Dex</h1>
+                    <h1 class="text-lg font-extrabold tracking-tight bg-gradient-to-r from-white via-indigo-200 to-purple-400 bg-clip-text text-transparent">PokeQuest Living Dex</h1>
                     <p class="text-[10px] text-indigo-400 font-semibold uppercase tracking-wider">Tactical Campaign Companion</p>
                 </div>
             </div>
@@ -68,10 +76,10 @@
             <div class="bg-gradient-to-r from-slate-900 to-indigo-950/40 p-6 rounded-2xl border border-indigo-500/10 shadow-xl flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div>
                     <h2 class="text-xl font-bold mb-1 text-white flex items-center gap-2">
-                        <span>🧭</span> Campaign Overview
+                        <span>🧭</span> Campaign Dashboard
                     </h2>
                     <p class="text-xs text-slate-400 leading-relaxed max-w-3xl">
-                        Welcome to the <strong>PokeQuest Master Campaign</strong>. By utilizing your legacy hardware (DS Lite, New 3DS XL, Virtual Console, physical carts) and bridging them with modern consoles, you are preparing to build a living museum. Follow the targeted operations below to secure the rarest species first!
+                        Welcome to your master campaign blueprint. This tracker monitors operations across your entire device arsenal (**DS Lite, New 3DS XL, Switch, and Switch 2**). Select target games below to focus your goals.
                     </p>
                 </div>
                 <button onclick="toggleCreateMissionPanel()" class="shrink-0 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs px-5 py-3 rounded-xl transition duration-200 shadow-md shadow-indigo-600/20 hover:scale-[1.02]">
@@ -79,11 +87,38 @@
                 </button>
             </div>
 
+            <!-- Campaign Progress Matrix Hub -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 bg-slate-900/40 border border-slate-800/80 p-5 rounded-2xl">
+                <!-- Left Side: Global Progress Bar -->
+                <div class="md:col-span-1 flex flex-col justify-between space-y-4">
+                    <div>
+                        <h3 class="text-xs font-extrabold tracking-wider text-slate-400 uppercase">Master Campaign Progress</h3>
+                        <p class="text-[10px] text-indigo-400 font-semibold mt-0.5 font-mono">GLOBAL SYNCHRONIZATION</p>
+                    </div>
+                    <div>
+                        <div class="flex justify-between items-baseline mb-1.5">
+                            <span id="overall-progress-text" class="text-3xl font-extrabold text-white font-mono">0%</span>
+                            <span class="text-[10px] font-bold text-indigo-400 uppercase">Completed</span>
+                        </div>
+                        <div class="w-full bg-slate-950 h-3.5 rounded-full overflow-hidden border border-slate-800">
+                            <div id="overall-progress-bar" class="h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 shadow-lg shadow-indigo-500/20 transition-all duration-500 w-0"></div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Right Side: Per-Game Progress Matrix -->
+                <div class="md:col-span-2 space-y-3">
+                    <h3 class="text-xs font-extrabold tracking-wider text-slate-400 uppercase">Active Hardware Channels</h3>
+                    <div id="game-progress-grid" class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                        <!-- Dynamically generated game channels populate here -->
+                    </div>
+                </div>
+            </div>
+
             <!-- Create Custom Mission Slider Panel -->
             <div id="create-mission-panel" class="hidden bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
                 <div class="border-b border-slate-800 pb-3 flex items-center justify-between">
                     <h3 class="text-sm font-bold text-white flex items-center gap-2">⚔️ Forge a Custom Quest Route</h3>
-                    <span class="text-[10px] text-indigo-400 font-semibold uppercase tracking-wider">Dynamic Sync Enabled</span>
+                    <span class="text-[10px] text-indigo-400 font-semibold uppercase tracking-wider">Campaign Sync Integration</span>
                 </div>
                 <form id="new-mission-form" onsubmit="createNewMission(event)" class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="space-y-1.5">
@@ -91,15 +126,29 @@
                         <input type="text" id="new-m-title" required placeholder="e.g., Ribbon Hunting Phase" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-indigo-500 transition">
                     </div>
                     <div class="space-y-1.5">
-                        <label class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Platform/Target Game</label>
-                        <input type="text" id="new-m-platform" required placeholder="e.g., Emerald (DS Lite)" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-indigo-500 transition">
+                        <label class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Associated Target Game</label>
+                        <select id="new-m-game" class="w-full px-3 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-indigo-500 transition cursor-pointer">
+                            <option value="Emerald">🧪 Emerald</option>
+                            <option value="Crystal">🧅 Crystal</option>
+                            <option value="Platinum">💫 Platinum</option>
+                            <option value="HeartGold">🥎 HeartGold</option>
+                            <option value="Black 2">🐉 Black 2</option>
+                            <option value="Yellow">🐱 Yellow</option>
+                            <option value="Ultra Moon">🌀 Ultra Moon</option>
+                            <option value="Legends: Z-A">🗼 Legends: Z-A</option>
+                            <option value="Other">⚔️ Custom/Other</option>
+                        </select>
                     </div>
                     <div class="space-y-1.5">
-                        <label class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Badge Label</label>
-                        <input type="text" id="new-m-tag" required placeholder="e.g., Mission 6" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-indigo-500 transition">
+                        <label class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Specific Hardware Version</label>
+                        <input type="text" id="new-m-platform" required placeholder="e.g., GBA (DS Lite Slot)" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-indigo-500 transition">
                     </div>
                     <div class="space-y-1.5">
-                        <label class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Accent Theme Color</label>
+                        <label class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Badge Label text</label>
+                        <input type="text" id="new-m-tag" required placeholder="e.g., Custom Hunt" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-indigo-500 transition">
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Accent Color Theme</label>
                         <select id="new-m-color" class="w-full px-3 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-indigo-500 transition cursor-pointer">
                             <option value="indigo">💜 Indigo</option>
                             <option value="emerald">💚 Emerald</option>
@@ -109,17 +158,17 @@
                             <option value="rose">❤️ Rose</option>
                         </select>
                     </div>
-                    <div class="space-y-1.5 md:col-span-2">
+                    <div class="space-y-1.5">
                         <label class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Target Emoji Icon</label>
                         <input type="text" id="new-m-emoji" required placeholder="e.g., 🎗️" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-indigo-500 transition">
                     </div>
                     <div class="space-y-1.5 md:col-span-2">
                         <label class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Mission Objective Description</label>
-                        <textarea id="new-m-desc" required placeholder="Describe what makes this custom mission unique..." class="w-full h-20 px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none resize-none focus:border-indigo-500 transition"></textarea>
+                        <textarea id="new-m-desc" required placeholder="Describe what makes this custom campaign unique..." class="w-full h-20 px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none resize-none focus:border-indigo-500 transition"></textarea>
                     </div>
                     <div class="space-y-1.5 md:col-span-2">
                         <label class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Task Checklists (Press Enter for new line)</label>
-                        <textarea id="new-m-tasks" required placeholder="Catch wild Heracross&#10;Transfer via Gen 4 bridge&#10;Upgrade ribbons in Sinnoh" class="w-full h-24 px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white font-mono focus:outline-none resize-none focus:border-indigo-500 transition"></textarea>
+                        <textarea id="new-m-tasks" required placeholder="Item task checklist step 1&#10;Item task checklist step 2&#10;Item task checklist step 3" class="w-full h-24 px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white font-mono focus:outline-none resize-none focus:border-indigo-500 transition"></textarea>
                     </div>
                     <div class="md:col-span-2 flex justify-end gap-3 pt-2">
                         <button type="button" onclick="toggleCreateMissionPanel()" class="px-4 py-2 bg-slate-950 hover:bg-slate-900 border border-slate-800 rounded-xl text-xs font-semibold text-slate-400 hover:text-white transition">Cancel</button>
@@ -128,9 +177,28 @@
                 </form>
             </div>
 
+            <!-- Interactive Campaign Game Filter Panel -->
+            <div class="border-b border-slate-800/60 pb-3 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                    <span>⚡</span> Filter Campaigns:
+                </span>
+                <div class="flex items-center space-x-2 overflow-x-auto pb-2 scrollbar-none max-w-full">
+                    <button onclick="filterMissionsBy('all')" id="m-filter-all" class="px-3.5 py-1.5 bg-indigo-600 text-white rounded-lg text-xs font-bold whitespace-nowrap transition-all">All Games</button>
+                    <button onclick="filterMissionsBy('Emerald')" id="m-filter-Emerald" class="px-3 py-1.5 bg-slate-950 text-slate-400 hover:text-white rounded-lg text-xs font-bold whitespace-nowrap transition-all">🧪 Emerald</button>
+                    <button onclick="filterMissionsBy('Crystal')" id="m-filter-Crystal" class="px-3 py-1.5 bg-slate-950 text-slate-400 hover:text-white rounded-lg text-xs font-bold whitespace-nowrap transition-all">🧅 Crystal</button>
+                    <button onclick="filterMissionsBy('Yellow')" id="m-filter-Yellow" class="px-3 py-1.5 bg-slate-950 text-slate-400 hover:text-white rounded-lg text-xs font-bold whitespace-nowrap transition-all">🐱 Yellow</button>
+                    <button onclick="filterMissionsBy('Platinum')" id="m-filter-Platinum" class="px-3 py-1.5 bg-slate-950 text-slate-400 hover:text-white rounded-lg text-xs font-bold whitespace-nowrap transition-all">💫 Platinum</button>
+                    <button onclick="filterMissionsBy('HeartGold')" id="m-filter-HeartGold" class="px-3 py-1.5 bg-slate-950 text-slate-400 hover:text-white rounded-lg text-xs font-bold whitespace-nowrap transition-all">🥎 HeartGold</button>
+                    <button onclick="filterMissionsBy('Black 2')" id="m-filter-Black2" class="px-3 py-1.5 bg-slate-950 text-slate-400 hover:text-white rounded-lg text-xs font-bold whitespace-nowrap transition-all">🐉 Black 2</button>
+                    <button onclick="filterMissionsBy('Ultra Moon')" id="m-filter-UltraMoon" class="px-3 py-1.5 bg-slate-950 text-slate-400 hover:text-white rounded-lg text-xs font-bold whitespace-nowrap transition-all">🌀 Ultra Moon</button>
+                    <button onclick="filterMissionsBy('Legends: Z-A')" id="m-filter-Legends" class="px-3 py-1.5 bg-slate-950 text-slate-400 hover:text-white rounded-lg text-xs font-bold whitespace-nowrap transition-all">🗼 Legends: Z-A</button>
+                    <button onclick="filterMissionsBy('Other')" id="m-filter-Other" class="px-3 py-1.5 bg-slate-950 text-slate-400 hover:text-white rounded-lg text-xs font-bold whitespace-nowrap transition-all">⚔️ Other</button>
+                </div>
+            </div>
+
             <!-- Dynamic Mission Render Grid -->
             <div id="missions-grid" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <!-- Dynamically rendered missions are injected here by Javascript -->
+                <!-- Dynamically rendered missions injected here -->
             </div>
         </section>
 
@@ -274,105 +342,186 @@
 
     <!-- Footer -->
     <footer class="text-center py-8 text-[10px] text-slate-600 border-t border-slate-900 bg-slate-950/40">
-        <p>PokeQuest Master Living Dex Dashboard • Built with Precision</p>
+        <p>PokeQuest Master Living Dex Dashboard • Hardware Companion Engine</p>
     </footer>
 
     <script>
         // Default Key High Priority Pokemon
         const defaultPokemonList = [
             { num: 1, name: "Bulbasaur", gen: 1, base: false, male: false, female: false, shiny: false, regional: false, form: false },
-            { num: 2, name: "Ivysaur", gen: 1, base: false, male: false, female: false, shiny: false, regional: false, form: false },
-            { num: 3, name: "Venusaur", gen: 1, base: false, male: false, female: false, shiny: false, regional: false, form: false },
             { num: 19, name: "Rattata", gen: 1, base: false, male: false, female: false, shiny: false, regional: false, form: false },
             { num: 37, name: "Vulpix", gen: 1, base: false, male: false, female: false, shiny: false, regional: false, form: false },
             { num: 25, name: "Pikachu", gen: 1, base: false, male: false, female: false, shiny: false, regional: false, form: false },
             { num: 133, name: "Eevee", gen: 1, base: false, male: false, female: false, shiny: false, regional: false, form: false },
-            { num: 149, name: "Dragonite", gen: 1, base: false, male: false, female: false, shiny: false, regional: false, form: false },
             { num: 152, name: "Chikorita", gen: 2, base: false, male: false, female: false, shiny: false, regional: false, form: false },
-            { num: 153, name: "Bayleef", gen: 2, base: false, male: false, female: false, shiny: false, regional: false, form: false },
-            { num: 154, name: "Meganium", gen: 2, base: false, male: false, female: false, shiny: false, regional: false, form: false },
             { num: 201, name: "Unown", gen: 2, base: false, male: false, female: false, shiny: false, regional: false, form: false },
-            { num: 186, name: "Politoed", gen: 2, base: false, male: false, female: false, shiny: false, regional: false, form: false },
             { num: 249, name: "Lugia", gen: 2, base: false, male: false, female: false, shiny: false, regional: false, form: false },
             { num: 251, name: "Celebi", gen: 2, base: false, male: false, female: false, shiny: false, regional: false, form: false }
         ];
 
-        // Dynamic Default Campaigns List
+        // Dynamic Campaigns List mapped precisely to your exact cartridge library
         const defaultMissions = [
             {
-                id: "m1",
-                title: "The 100% Legit Shiny Mythical",
-                tag: "Mission 1",
+                id: "m_emerald_cloning",
+                title: "Battle Frontier Cloning Lab",
+                tag: "Emerald (GBA)",
                 color: "emerald",
-                platform: "VC Crystal (3DS)",
-                emoji: "🧅",
-                desc: "Beat the Johto Elite Four to unlock the legendary, native GS Ball event in Goldenrod City. This is the only place in mainline Pokémon history to hunt an infinite, completely legitimate Shiny Celebi.",
+                platform: "GBA (on DS Lite)",
+                game: "Emerald",
+                emoji: "🧪",
+                desc: "Exploit Emerald's famous Battle Tower PC glitch to clone your rarest catches, master balls, and shinies before transferring them up. This preserves high-value assets on your GBA cart while sending duplicates up to modern games.",
                 tasks: [
-                    { id: "m1_t1", text: "Beat the Elite Four and enter the Hall of Fame.", checked: false },
-                    { id: "m1_t2", text: "Trigger the GS Ball event inside the Goldenrod City Pokémon Center.", checked: false },
-                    { id: "m1_t3", text: "Deliver the GS Ball to Kurt in Azalea Town and wait exactly 24 hours.", checked: false },
-                    { id: "m1_t4", text: "Retrieve the active GS Ball from Kurt and save in front of Ilex Shrine.", checked: false },
-                    { id: "m1_t5", text: "Soft-Reset (L+R+Start+Select) until you encounter Shiny Celebi (1/8192 odds).", checked: false }
+                    { id: "m_em_t1", text: "Defeat the Hoenn Elite Four and unlock the Battle Frontier.", checked: false },
+                    { id: "m_em_t2", text: "Navigate to the Battle Tower and stand in front of the PC inside.", checked: false },
+                    { id: "m_em_t3", text: "Deposit the Pokemon (and held items) you wish to clone into an empty box.", checked: false },
+                    { id: "m_em_t4", text: "Exit the PC, save your game, and deposit them back into your party.", checked: false },
+                    { id: "m_em_t5", text: "Talk to the multi-battle receptionist on the far right, choose 2 Mon, and pause on her save prompt.", checked: false },
+                    { id: "m_em_t6", text: "Soft-reset (A+B+Start+Select) when the screen dims, load your save, and verify duplicates in your PC box.", checked: false }
                 ]
             },
             {
-                id: "m2",
-                title: "The 28-Form Alphabet Soup",
-                tag: "Mission 2",
+                id: "m_crystal_celebi",
+                title: "The 100% Legit Shiny Celebi",
+                tag: "Crystal (VC)",
                 color: "cyan",
-                platform: "Platinum (DS Lite)",
-                emoji: "🔤",
-                desc: "Travel to the Solaceon Ruins in Sinnoh. Capture letters A through Z in the main chambers, expand the Ruin Maniac's tunnel, and enter the hidden chamber to catch the '?' and '!' forms.",
+                platform: "3DS Virtual Console",
+                game: "Crystal",
+                emoji: "🧅",
+                desc: "Unlike Gold & Silver, the 3DS Virtual Console edition of Crystal unlocks the legendary GS Ball event natively. This remains the absolute best and most legal physical method in series history to shiny hunt Celebi.",
                 tasks: [
-                    { id: "m2_t1", text: "Navigate to Solaceon Ruins on Route 209.", checked: false },
-                    { id: "m2_t2", text: "Capture all 26 alphabet Unown forms in the ruins' main chambers.", checked: false },
-                    { id: "m2_t3", text: "Verify the Ruin Maniac's tunnel on Route 210 is fully dug out.", checked: false },
-                    { id: "m2_t4", text: "Enter the secret top room and capture Unown '?' and '!'.", checked: false }
+                    { id: "m_cel_t1", text: "Beat the Elite Four and enter the Hall of Fame.", checked: false },
+                    { id: "m_cel_t2", text: "Enter the Goldenrod Pokemon Center to trigger the GS Ball delivery clerk.", checked: false },
+                    { id: "m_cel_t3", text: "Take the GS Ball to Kurt in Azalea Town and wait exactly 24 hours.", checked: false },
+                    { id: "m_cel_t4", text: "Retrieve the active GS Ball and save directly in front of the Ilex Forest Shrine.", checked: false },
+                    { id: "m_cel_t5", text: "Soft-Reset (L+R+Start+Select) until Shiny Celebi appears (1/8192 odds).", checked: false }
                 ]
             },
             {
-                id: "m3",
-                title: "Dream Ball & Hidden Abilities",
-                tag: "Mission 3",
+                id: "m_crystal_ditto",
+                title: "1-in-64 Shiny breeding Loop",
+                tag: "Crystal (VC)",
                 color: "purple",
-                platform: "Dream Radar + HG + Black 2 (3DS)",
-                emoji: "☁️",
-                desc: "Hook your physical HeartGold cart into your 3DS, boot Dream Radar, and shoot down pink dream clouds. Secure a Multiscale Lugia and the Gen 5 Therian genies caught inside rare, pink Dream Balls.",
+                platform: "3DS Virtual Console",
+                game: "Crystal",
+                emoji: "🧬",
+                desc: "Exploit Gen 2's stat-based breeding system. By performing the double-transform glitch on a wild Ditto with a Shiny baby, any egg the Ditto produces has a phenomenal 1-in-64 shiny hatch rate.",
                 tasks: [
-                    { id: "m3_t1", text: "Insert physical HeartGold into the 3DS game slot before opening Dream Radar.", checked: false },
-                    { id: "m3_t2", text: "Unlock the Gilded Cloud Chamber and capture a Multiscale Lugia in a Dream Ball.", checked: false },
-                    { id: "m3_t3", text: "Capture Therian forms of Landorus, Thundurus, and Tornadus.", checked: false },
-                    { id: "m3_t4", text: "Send radar creatures to Pokémon Black 2 and staging box 1.", checked: false }
+                    { id: "m_dit_t1", text: "Hatch the Route 34 Odd Egg into a Shiny Cleffa or Shiny Igglybuff (14% chance).", checked: false },
+                    { id: "m_dit_t2", text: "Level your shiny baby until it learns Metronome.", checked: false },
+                    { id: "m_dit_t3", text: "Encounter a wild Ditto on Route 34, let it copy your shiny baby, then let it use Metronome -> Transform.", checked: false },
+                    { id: "m_dit_t4", text: "Catch the double-transformed Ditto (its shiny genes are now hard-coded).", checked: false },
+                    { id: "m_dit_t5", text: "Leave it in the daycare with any target species to breed 1-in-64 shinies.", checked: false }
                 ]
             },
             {
-                id: "m4",
-                title: "The Regional Form Factory",
-                tag: "Mission 4",
-                color: "amber",
-                platform: "Ultra Moon (3DS)",
-                emoji: "🌴",
-                desc: "Produce infinite copies of Alolan variants. If bred outside Alola, eggs hatch into classic Kanto forms. Secure them by using the Everstone item natively in Alola.",
-                tasks: [
-                    { id: "m4_t1", text: "Capture Alolan regional species directly in the wild (Vulpix, Sandshrew, Meowth, etc.).", checked: false },
-                    { id: "m4_t2", text: "Obtain multiple Everstones (found wild on Roggenrola or picked in trials).", checked: false },
-                    { id: "m4_t3", text: "Equip an Everstone on the Alolan parent before leaving it at Paniola Ranch.", checked: false },
-                    { id: "m4_t4", text: "Hatch eggs to confirm offspring retained the proper Alolan typing.", checked: false }
-                ]
-            },
-            {
-                id: "m5",
-                title: "The Cute Charm Glitch Vault",
-                tag: "Mission 5",
+                id: "m_yellow_mew",
+                title: "Bypassing Mew's Transporter Lock",
+                tag: "Yellow (VC)",
                 color: "rose",
-                platform: "Platinum Copy B (DS Lite)",
-                emoji: "✨",
-                desc: "Break your second copy of Platinum's RNG system. Force custom Trainer/Secret IDs at startup so Cute Charm boosts wild encounter shiny odds to a massive 21%.",
+                platform: "3DS Virtual Console",
+                game: "Yellow",
+                emoji: "🐱",
+                desc: "Perform the legendary Trainer-Fly glitch to catch Mew in Cerulean City. To pass Poke Transporter's security check, you must train its EXP and stats to mimic the official GF event Mew exactly.",
                 tasks: [
-                    { id: "m5_t1", text: "Wipe save files and configure an external clock/tool to time initial generation down to the exact second.", checked: false },
-                    { id: "m5_t2", text: "Confirm matching Trainer ID (TID) and Secret ID (SID) combinations inside the summary screen.", checked: false },
-                    { id: "m5_t3", text: "Obtain a male Pokémon possessing the 'Cute Charm' ability (e.g., Clefairy/Jigglypuff) as your lead party slot.", checked: false },
-                    { id: "m5_t4", text: "Hunt in wild grass to secure rapid shiny female variants (21% chance).", checked: false }
+                    { id: "m_mew_t1", text: "Set up the Trainer-Fly escape on Route 24 and trigger the battle with the Swimmer in Misty's Gym.", checked: false },
+                    { id: "m_mew_t2", text: "Return to Route 24, capture the wild Level 7 Mew, and name yourself exactly 'GF' (ID: 22796).", checked: false },
+                    { id: "m_mew_t3", text: "Grind Mew's experience level until its total EXP is exactly 1,059,860.", checked: false },
+                    { id: "m_mew_t4", text: "Run Mew through Poke Transporter to safely deposit a VC Mew directly into Pokemon Bank.", checked: false }
+                ]
+            },
+            {
+                id: "m_platinum_cutecharm",
+                title: "The 21% Shiny Cute Charm Glitch",
+                tag: "Platinum (DS)",
+                color: "indigo",
+                platform: "DS Lite (Physical Carts)",
+                game: "Platinum",
+                emoji: "💫",
+                desc: "With two copies of Platinum, dedicate one cartridge to exploit Gen 4's RNG engine. Matching your Trainer ID (TID) and Secret ID (SID) forces a 21.8% shiny rate whenever a Cute Charm Pokemon leads your team.",
+                tasks: [
+                    { id: "m_cc_t1", text: "Dethrone your second Platinum save and configure an external clock to hit the target TID/SID seed.", checked: false },
+                    { id: "m_cc_t2", text: "Verify that your TID and SID match the specific 'Cute Charm Group' numbers.", checked: false },
+                    { id: "m_cc_t3", text: "Catch a male Clefairy/Jigglypuff with Cute Charm and put it in your lead party slot.", checked: false },
+                    { id: "m_cc_t4", text: "Explore Sinnoh's wild grass to watch 1 out of every 5 wild females appear Shiny.", checked: false }
+                ]
+            },
+            {
+                id: "m_platinum_dns",
+                title: "Sinnoh Event DNS Restore",
+                tag: "Platinum (DS)",
+                color: "cyan",
+                platform: "3DS XL / DS Lite",
+                game: "Platinum",
+                emoji: "📡",
+                desc: "Configure your network settings to route through a custom DNS proxy. This tricks your cartridge into downloading physical retro events (Member Card, Oak's Letter) to hunt Shiny Darkrai and Shaymin.",
+                tasks: [
+                    { id: "m_dns_t1", text: "Change your system's connection DNS setting to 178.62.43.212.", checked: false },
+                    { id: "m_dns_t2", text: "Launch Platinum, select 'Mystery Gift', and search via Nintendo WFC.", checked: false },
+                    { id: "m_dns_t3", text: "Download the Member Card (Darkrai) and Oak's Letter (Shaymin) event keys.", checked: false },
+                    { id: "m_dns_t4", text: "Travel to Newmoon Island and Flower Paradise to soft-reset for shiny mythicals.", checked: false }
+                ]
+            },
+            {
+                id: "m_hg_apriballs",
+                title: "The daily Apriball Factory",
+                tag: "HeartGold (DS)",
+                color: "amber",
+                platform: "DS Lite / 3DS XL",
+                game: "HeartGold",
+                emoji: "🥎",
+                desc: "HeartGold is the absolute best game for gathering rare Kurt Poke Balls. Mass-producing Heavy, Lure, and Moon balls allows you to catch matching-aesthetic legendaries for your museum.",
+                tasks: [
+                    { id: "m_ap_t1", text: "Unlock the daily Apricorn routes around Kanto and Johto.", checked: false },
+                    { id: "m_ap_t2", text: "Deliver batches of Apricorns to Kurt in Azalea Town.", checked: false },
+                    { id: "m_ap_t3", text: "Harvest your custom Level, Heavy, Friend, Love, and Moon balls after 24 hours.", checked: false },
+                    { id: "m_ap_t4", text: "Export caught legendaries in aesthetic matching Apriballs to HOME.", checked: false }
+                ]
+            },
+            {
+                id: "m_b2_shinies",
+                title: "The Unova Shiny Permits",
+                tag: "Black 2 (DS)",
+                color: "rose",
+                platform: "DS / 3DS XL",
+                game: "Black 2",
+                emoji: "🐉",
+                desc: "Black 2 offers two highly coveted, completely guaranteed, static shiny encounters that are native to your cartridge and require zero soft-resetting.",
+                tasks: [
+                    { id: "m_b2_t1", text: "Defeat Benga in Area 10 of the Black Tower to receive a guaranteed Shiny Gible.", checked: false },
+                    { id: "m_b2_t2", text: "Talk to every single Pokemon species in the Unova Dex to fully unlock the 'Seen' Dex.", checked: false },
+                    { id: "m_b2_t3", text: "Receive the Permit from Professor Juniper in Nuvema Town.", checked: false },
+                    { id: "m_b2_t4", text: "Fly to the Nature Preserve and capture the guaranteed level 60 Shiny Haxorus.", checked: false }
+                ]
+            },
+            {
+                id: "m_um_wormholes",
+                title: "Alolan Warp Ride Lottery",
+                tag: "Ultra Moon (3DS)",
+                color: "purple",
+                platform: "3DS Digital",
+                game: "Ultra Moon",
+                emoji: "🌀",
+                desc: "Using the Ultra Warp Ride, non-legendary targets sitting in Tier 4 double-ring wormholes have a massive 36% shiny encounter rate. Great for easily filling out rare shiny slots.",
+                tasks: [
+                    { id: "m_um_t1", text: "Configure your motion controls to Circle Pad inside Alola's Game Freak office.", checked: false },
+                    { id: "m_um_t2", text: "Fly past 4,000 light-years in the Ultra Warp Ride minigame.", checked: false },
+                    { id: "m_um_t3", text: "Enter a Tier 4 (double-ringed, sparkling) warp portal.", checked: false },
+                    { id: "m_um_t4", text: "Secure instant wild Shinies with 36% flat base odds.", checked: false }
+                ]
+            },
+            {
+                id: "m_za_mega",
+                title: "Lumiose Mega Evolution Prep",
+                tag: "Legends: Z-A",
+                color: "emerald",
+                platform: "Switch / Switch 2",
+                game: "Legends: Z-A",
+                emoji: "🗼",
+                desc: "Prepare for the absolute revival of Mega Evolution inside the Lumiose City urban redevelopment. Set up transfers for high-value Kalos native species so they are ready to evolve on day one.",
+                tasks: [
+                    { id: "m_za_t1", text: "Secure base forms of Gen 6 starters (Chespin, Fennekin, Froakie).", checked: false },
+                    { id: "m_za_t2", text: "Gather species known to historically Mega-evolve (Gyarados, Lucario, Charizard).", checked: false },
+                    { id: "m_za_t3", text: "Maintain a designated holding box in HOME for Z-A transfer launch.", checked: false }
                 ]
             }
         ];
@@ -381,15 +530,17 @@
         let activePokemonList = [...defaultPokemonList];
         let activeMissionsList = [...defaultMissions];
 
-        // Pagination State
+        // Pagination State & Active Filter State
         let currentPage = 1;
         const itemsPerPage = 48;
         let filteredPokemon = [];
+        let activeMissionFilter = 'all';
 
         window.onload = function() {
             loadLocalState();
             refreshSyncAreas();
             updateStatsSummary();
+            calculateProgress();
             renderMissions();
             applyFiltersAndRender();
         };
@@ -415,6 +566,7 @@
             }
         }
 
+        // Custom Toast system
         function triggerToast(message, type = 'info') {
             const wrapper = document.getElementById('toast-wrapper');
             const toast = document.createElement('div');
@@ -444,41 +596,41 @@
         }
 
         function saveLocalState() {
-            const package = {
+            const packageObj = {
                 missions: activeMissionsList,
                 pokemon: activePokemonList
             };
-            localStorage.setItem('poke_quest_data_v2', JSON.stringify(package));
+            localStorage.setItem('poke_quest_data_v2', JSON.stringify(packageObj));
             refreshSyncAreas();
             updateStatsSummary();
+            calculateProgress();
         }
 
         function loadLocalState() {
             const savedRaw = localStorage.getItem('poke_quest_data_v2');
             if (savedRaw) {
                 try {
-                    const package = JSON.parse(savedRaw);
-                    
-                    // Restore Pokemon list
-                    if (package.pokemon && Array.isArray(package.pokemon) && package.pokemon.length > 0) {
-                        activePokemonList = package.pokemon;
+                    const packageObj = JSON.parse(savedRaw);
+                    if (packageObj.pokemon && Array.isArray(packageObj.pokemon) && packageObj.pokemon.length > 0) {
+                        activePokemonList = packageObj.pokemon;
                     }
-
-                    // Dynamic Missions Recovery + Backward Compatibility Layer
-                    if (package.missions) {
-                        if (Array.isArray(package.missions)) {
-                            // If it's a dynamic array, restore it directly
-                            activeMissionsList = package.missions;
-                        } else {
-                            // If it's an old legacy checked map (e.g., m1_t1: true), convert map state back to dynamic structure
-                            activeMissionsList = [...defaultMissions].map(m => {
-                                const mappedTasks = m.tasks.map(t => {
-                                    return {
-                                        ...t,
-                                        checked: package.missions[t.id] || false
-                                    };
-                                });
-                                return { ...m, tasks: mappedTasks };
+                    if (packageObj.missions) {
+                        if (Array.isArray(packageObj.missions)) {
+                            // Map incoming missions to ensure they have complete structural properties
+                            activeMissionsList = packageObj.missions.map(m => {
+                                // Default game classification fallback
+                                if (!m.game) {
+                                    if (m.tag.includes("Emerald")) m.game = "Emerald";
+                                    else if (m.tag.includes("Crystal")) m.game = "Crystal";
+                                    else if (m.tag.includes("Yellow")) m.game = "Yellow";
+                                    else if (m.tag.includes("Platinum")) m.game = "Platinum";
+                                    else if (m.tag.includes("HeartGold")) m.game = "HeartGold";
+                                    else if (m.tag.includes("Black 2")) m.game = "Black 2";
+                                    else if (m.tag.includes("Ultra Moon")) m.game = "Ultra Moon";
+                                    else if (m.tag.includes("Legends")) m.game = "Legends: Z-A";
+                                    else m.game = "Other";
+                                }
+                                return m;
                             });
                         }
                     }
@@ -488,16 +640,135 @@
             }
         }
 
-        // Toggle custom/creation slider
         function toggleCreateMissionPanel() {
             const panel = document.getElementById('create-mission-panel');
             panel.classList.toggle('hidden');
         }
 
-        // Action to create custom dynamic mission
+        function calculateProgress() {
+            const activeGamesList = ["Emerald", "Crystal", "Yellow", "Platinum", "HeartGold", "Black 2", "Ultra Moon", "Legends: Z-A", "Other"];
+            const gameStats = {};
+            activeGamesList.forEach(g => {
+                gameStats[g] = { total: 0, completed: 0 };
+            });
+
+            let globalTotal = 0;
+            let globalCompleted = 0;
+
+            activeMissionsList.forEach(m => {
+                const gameKey = m.game || "Other";
+                if (!gameStats[gameKey]) {
+                    gameStats[gameKey] = { total: 0, completed: 0 };
+                }
+                m.tasks.forEach(t => {
+                    globalTotal++;
+                    gameStats[gameKey].total++;
+                    if (t.checked) {
+                        globalCompleted++;
+                        gameStats[gameKey].completed++;
+                    }
+                });
+            });
+
+            // Calculate overall percentage
+            const overallPercent = globalTotal > 0 ? Math.round((globalCompleted / globalTotal) * 100) : 0;
+            document.getElementById('overall-progress-bar').style.width = `${overallPercent}%`;
+            document.getElementById('overall-progress-text').innerText = `${overallPercent}% (${globalCompleted}/${globalTotal})`;
+
+            // Render hardware channels progress grid
+            const statsGrid = document.getElementById('game-progress-grid');
+            statsGrid.innerHTML = "";
+
+            const gameEmojis = {
+                "Emerald": "🧪",
+                "Crystal": "🧅",
+                "Yellow": "🐱",
+                "Platinum": "💫",
+                "HeartGold": "🥎",
+                "Black 2": "🐉",
+                "Ultra Moon": "🌀",
+                "Legends: Z-A": "🗼",
+                "Other": "⚔️"
+            };
+
+            const gameColors = {
+                "Emerald": "emerald",
+                "Crystal": "cyan",
+                "Yellow": "rose",
+                "Platinum": "indigo",
+                "HeartGold": "amber",
+                "Black 2": "rose",
+                "Ultra Moon": "purple",
+                "Legends: Z-A": "emerald",
+                "Other": "slate"
+            };
+
+            activeGamesList.forEach(game => {
+                const stats = gameStats[game];
+                if (stats.total === 0) return; // Hide games with zero assigned missions
+
+                const percent = Math.round((stats.completed / stats.total) * 100);
+                const color = gameColors[game] || "slate";
+                const emoji = gameEmojis[game] || "⚙️";
+
+                let barColorClass = "bg-indigo-500";
+                if (color === "emerald") barColorClass = "bg-emerald-500";
+                if (color === "cyan") barColorClass = "bg-cyan-500";
+                if (color === "indigo") barColorClass = "bg-indigo-500";
+                if (color === "amber") barColorClass = "bg-amber-500";
+                if (color === "rose") barColorClass = "bg-rose-500";
+                if (color === "purple") barColorClass = "bg-purple-500";
+
+                const channelCard = document.createElement('div');
+                channelCard.className = "bg-slate-950/80 border border-slate-800/80 p-3 rounded-xl flex flex-col justify-between";
+                channelCard.innerHTML = `
+                    <div class="flex items-center justify-between text-[10px] font-semibold mb-1">
+                        <span class="text-slate-300 flex items-center gap-1">${emoji} ${game}</span>
+                        <span class="text-slate-400 font-mono">${percent}%</span>
+                    </div>
+                    <div class="w-full bg-slate-900 h-1.5 rounded-full overflow-hidden border border-slate-800/40">
+                        <div class="h-full ${barColorClass} transition-all duration-300" style="width: ${percent}%"></div>
+                    </div>
+                `;
+                statsGrid.appendChild(channelCard);
+            });
+        }
+
+        function filterMissionsBy(game) {
+            activeMissionFilter = game;
+
+            const filterIds = {
+                'all': 'm-filter-all',
+                'Emerald': 'm-filter-Emerald',
+                'Crystal': 'm-filter-Crystal',
+                'Yellow': 'm-filter-Yellow',
+                'Platinum': 'm-filter-Platinum',
+                'HeartGold': 'm-filter-HeartGold',
+                'Black 2': 'm-filter-Black2',
+                'Ultra Moon': 'm-filter-UltraMoon',
+                'Legends: Z-A': 'm-filter-Legends',
+                'Other': 'm-filter-Other'
+            };
+
+            Object.keys(filterIds).forEach(key => {
+                const btn = document.getElementById(filterIds[key]);
+                if (btn) {
+                    if (key === game) {
+                        btn.className = "px-3.5 py-1.5 bg-indigo-600 text-white rounded-lg text-xs font-bold whitespace-nowrap transition-all shadow-md shadow-indigo-600/10";
+                    } else {
+                        btn.className = "px-3 py-1.5 bg-slate-950 text-slate-400 hover:text-white rounded-lg text-xs font-bold whitespace-nowrap transition-all";
+                    }
+                }
+            });
+
+            renderMissions();
+        }
+
+        // Dynamic Mission Creation Action
         function createNewMission(event) {
             event.preventDefault();
             const title = document.getElementById('new-m-title').value.trim();
+            const game = document.getElementById('new-m-game').value;
             const platform = document.getElementById('new-m-platform').value.trim();
             const tag = document.getElementById('new-m-tag').value.trim();
             const color = document.getElementById('new-m-color').value;
@@ -525,6 +796,7 @@
                 tag: tag,
                 color: color,
                 platform: platform,
+                game: game,
                 emoji: emoji,
                 desc: desc,
                 tasks: processedTasks
@@ -539,7 +811,6 @@
             triggerToast(`New mission "${title}" published!`, 'success');
         }
 
-        // Double confirm native deletion method (compliant with absolute NO confirm() rule)
         function deleteMission(missionId) {
             const btn = document.getElementById(`del-btn-${missionId}`);
             if (btn.dataset.confirm === "true") {
@@ -552,7 +823,6 @@
                 btn.innerText = "⚠️ Confirm?";
                 btn.classList.add('bg-rose-600', 'text-white', 'border-transparent');
                 
-                // Disarm after 3 seconds of inactivity
                 setTimeout(() => {
                     if (btn) {
                         btn.dataset.confirm = "false";
@@ -563,16 +833,31 @@
             }
         }
 
-        // Dynamic campaign card renderer
         function renderMissions() {
             const grid = document.getElementById('missions-grid');
             grid.innerHTML = "";
 
-            activeMissionsList.forEach(m => {
+            // Filter active list based on filter index
+            const displayList = activeMissionsList.filter(m => {
+                if (activeMissionFilter === 'all') return true;
+                return m.game === activeMissionFilter;
+            });
+
+            if (displayList.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-1 lg:col-span-2 text-center py-12 bg-slate-900/20 border border-dashed border-slate-800 rounded-2xl">
+                        <span class="text-3xl">📭</span>
+                        <h3 class="text-sm font-bold text-slate-300 mt-2">No Active Missions</h3>
+                        <p class="text-xs text-slate-500 mt-1">Select another hardware target or forge a custom campaign route above.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            displayList.forEach(m => {
                 const card = document.createElement('div');
                 card.className = "bg-slate-900/60 border border-slate-800 rounded-2xl p-5 hover:border-slate-700/60 transition-all flex flex-col justify-between relative group";
                 
-                // Color mapping logic
                 let colorClass = "bg-indigo-500/10 text-indigo-400 border-indigo-500/20";
                 if (m.color === 'emerald') colorClass = "bg-emerald-500/10 text-emerald-400 border-emerald-500/20";
                 if (m.color === 'cyan') colorClass = "bg-cyan-500/10 text-cyan-400 border-cyan-500/20";
@@ -604,7 +889,6 @@
                             ${tasksHTML}
                         </ul>
                     </div>
-                    <!-- Inline custom deletion toggle -->
                     <button id="del-btn-${m.id}" onclick="deleteMission('${m.id}')" class="absolute top-4 right-4 h-8 w-8 rounded-lg border border-slate-800 bg-slate-950 text-slate-500 hover:text-rose-400 flex items-center justify-center text-xs transition duration-200" title="Delete Mission">
                         🗑️
                     </button>
@@ -613,7 +897,6 @@
             });
         }
 
-        // Toggle Dynamic Checkboxes
         function toggleDynamicTask(missionId, taskId) {
             const mIdx = activeMissionsList.findIndex(m => m.id === missionId);
             if (mIdx !== -1) {
@@ -640,7 +923,6 @@
             document.getElementById('api-progress-label').innerText = "Connecting to PokeAPI servers...";
 
             try {
-                // Fetch the total list of species up to Gen 9 limit
                 const response = await fetch('https://pokeapi.co/api/v2/pokemon-species/?limit=1025');
                 if (!response.ok) throw new Error("Connection failed");
                 const data = await response.json();
@@ -651,19 +933,17 @@
 
                 const results = data.results;
                 
-                // Parse exact IDs from the URL and map
                 const fetchedPokemon = results.map((item) => {
                     const urlParts = item.url.split('/').filter(Boolean);
                     const num = parseInt(urlParts[urlParts.length - 1]);
                     const nameRaw = item.name;
                     
-                    // Clean names (remove hyphens)
                     const cleanName = nameRaw
                         .split('-')
                         .map(word => word.charAt(0).toUpperCase() + word.slice(1))
                         .join(' ');
 
-                    // Define generation thresholds
+                    // Correct generational mapping thresholds
                     let gen = 1;
                     if (num > 151) gen = 2;
                     if (num > 251) gen = 3;
@@ -687,14 +967,12 @@
                     };
                 });
 
-                // Sort purely by ID to guarantee perfect database organization
                 fetchedPokemon.sort((a, b) => a.num - b.num);
 
                 document.getElementById('api-progress-bar').style.width = '60%';
                 document.getElementById('api-progress-percent').innerText = '60%';
                 document.getElementById('api-progress-label').innerText = "Merging local user changes...";
 
-                // Map existing configurations to avoid deleting progress
                 const stateMap = {};
                 activePokemonList.forEach(p => {
                     stateMap[p.num] = p;
@@ -702,7 +980,6 @@
 
                 activePokemonList = fetchedPokemon.map(p => {
                     if (stateMap[p.num]) {
-                        // Merge achievements preserving keys
                         return {
                             ...p,
                             base: stateMap[p.num].base || false,
@@ -742,13 +1019,9 @@
             const stateFilter = document.getElementById('dex-state-filter').value;
 
             filteredPokemon = activePokemonList.filter(p => {
-                // Search match
                 const matchSearch = p.name.toLowerCase().includes(query) || p.num.toString().includes(query);
-                
-                // Gen filter match
                 const matchGen = (genFilter === 'all') || (p.gen.toString() === genFilter);
                 
-                // State filters
                 let matchState = true;
                 if (stateFilter === 'caught') {
                     matchState = (p.base || p.male || p.female || p.shiny || p.regional || p.form);
@@ -761,7 +1034,6 @@
                 return matchSearch && matchGen && matchState;
             });
 
-            // Boundary adjustments
             const maxPages = Math.ceil(filteredPokemon.length / itemsPerPage) || 1;
             if (currentPage > maxPages) currentPage = maxPages;
 
@@ -777,8 +1049,6 @@
             const endIdx = Math.min(startIdx + itemsPerPage, total);
 
             document.getElementById('pagination-info').innerText = `Showing ${total > 0 ? startIdx + 1 : 0} - ${endIdx} of ${total} entries`;
-            
-            // Buttons status
             document.getElementById('btn-prev-page').disabled = (currentPage === 1);
             document.getElementById('btn-next-page').disabled = (endIdx >= total);
 
@@ -788,7 +1058,6 @@
                 const card = document.createElement('div');
                 card.className = "bg-slate-900/40 border border-slate-800/80 p-4 rounded-xl flex flex-col justify-between hover:border-slate-700/60 transition duration-150";
                 
-                // Custom pill background based on generation
                 const genBadgeColors = [
                     "", "bg-rose-500/10 text-rose-400 border-rose-500/20", "bg-cyan-500/10 text-cyan-400 border-cyan-500/20",
                     "bg-emerald-500/10 text-emerald-400 border-emerald-500/20", "bg-yellow-500/10 text-yellow-400 border-yellow-500/20",
@@ -807,37 +1076,31 @@
                     </div>
                     
                     <div class="grid grid-cols-3 gap-1.5 mt-2">
-                        <!-- C (Caught Base Form) -->
                         <button onclick="toggleCardStat(${p.num}, 'base')" class="px-2 py-1.5 rounded-lg border text-[10px] font-bold transition flex flex-col items-center gap-0.5 cursor-pointer ${p.base ? 'bg-teal-500/20 border-teal-500/40 text-teal-300 shadow-md shadow-teal-500/5' : 'bg-slate-950 border-slate-800 text-slate-500 hover:text-slate-300'}">
                             <span>✅</span>
                             <span>Caught</span>
                         </button>
 
-                        <!-- Male -->
                         <button onclick="toggleCardStat(${p.num}, 'male')" class="px-2 py-1.5 rounded-lg border text-[10px] font-bold transition flex flex-col items-center gap-0.5 cursor-pointer ${p.male ? 'bg-blue-500/20 border-blue-500/40 text-blue-300' : 'bg-slate-950 border-slate-800 text-slate-500 hover:text-slate-300'}">
                             <span>♂</span>
                             <span>Male</span>
                         </button>
 
-                        <!-- Female -->
                         <button onclick="toggleCardStat(${p.num}, 'female')" class="px-2 py-1.5 rounded-lg border text-[10px] font-bold transition flex flex-col items-center gap-0.5 cursor-pointer ${p.female ? 'bg-pink-500/20 border-pink-500/40 text-pink-300' : 'bg-slate-950 border-slate-800 text-slate-500 hover:text-slate-300'}">
                             <span>♀</span>
                             <span>Female</span>
                         </button>
 
-                        <!-- Shiny -->
                         <button onclick="toggleCardStat(${p.num}, 'shiny')" class="px-2 py-1.5 rounded-lg border text-[10px] font-bold transition flex flex-col items-center gap-0.5 cursor-pointer ${p.shiny ? 'bg-amber-500/20 border-amber-500/40 text-amber-300 shadow-md shadow-amber-500/5' : 'bg-slate-950 border-slate-800 text-slate-500 hover:text-slate-300'}">
                             <span>✨</span>
                             <span>Shiny</span>
                         </button>
 
-                        <!-- Regional -->
                         <button onclick="toggleCardStat(${p.num}, 'regional')" class="px-2 py-1.5 rounded-lg border text-[10px] font-bold transition flex flex-col items-center gap-0.5 cursor-pointer ${p.regional ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-300' : 'bg-slate-950 border-slate-800 text-slate-500 hover:text-slate-300'}">
                             <span>🌴</span>
                             <span>Regional</span>
                         </button>
 
-                        <!-- Alt Form -->
                         <button onclick="toggleCardStat(${p.num}, 'form')" class="px-2 py-1.5 rounded-lg border text-[10px] font-bold transition flex flex-col items-center gap-0.5 cursor-pointer ${p.form ? 'bg-purple-500/20 border-purple-500/40 text-purple-300' : 'bg-slate-950 border-slate-800 text-slate-500 hover:text-slate-300'}">
                             <span>🌀</span>
                             <span>Form</span>
@@ -853,19 +1116,15 @@
             if (idx !== -1) {
                 activePokemonList[idx][key] = !activePokemonList[idx][key];
                 
-                // If checking alternate keys, make sure Base is checked as a dependency automatically
                 if (key !== 'base' && activePokemonList[idx][key]) {
                     activePokemonList[idx].base = true;
                 }
 
                 saveLocalState();
-                
-                // Find and update item locally to prevent full redraw which drops scroll coordinates
                 applyFiltersAndRender();
             }
         }
 
-        // Live Filters Triggers
         function handleSearch() {
             currentPage = 1;
             applyFiltersAndRender();
@@ -904,7 +1163,6 @@
             const baseCaughtCount = activePokemonList.filter(p => p.base).length;
             document.getElementById('stat-base-caught').innerText = baseCaughtCount;
 
-            // Forms summary calculations
             let formsCount = 0;
             activePokemonList.forEach(p => {
                 if (p.male) formsCount++;
@@ -917,12 +1175,11 @@
         }
 
         function refreshSyncAreas() {
-            const package = {
+            const packageObj = {
                 missions: activeMissionsList,
                 pokemon: activePokemonList
             };
-            // Serialize to readable base64 block to keep transfer tidy
-            const rawStr = JSON.stringify(package);
+            const rawStr = JSON.stringify(packageObj);
             const encoded = btoa(unescape(encodeURIComponent(rawStr)));
             document.getElementById('sync-export-area').value = encoded;
         }
@@ -946,22 +1203,8 @@
                 const parsed = JSON.parse(decodedRaw);
                 
                 if (parsed.missions || parsed.pokemon) {
-                    // Import Dynamic Missions List cleanly
-                    if (parsed.missions) {
-                        if (Array.isArray(parsed.missions)) {
-                            activeMissionsList = parsed.missions;
-                        } else {
-                            // Convert old legacy checkboxes map format automatically
-                            activeMissionsList = [...defaultMissions].map(m => {
-                                const mappedTasks = m.tasks.map(t => {
-                                    return {
-                                        ...t,
-                                        checked: parsed.missions[t.id] || false
-                                    };
-                                });
-                                return { ...m, tasks: mappedTasks };
-                            });
-                        }
+                    if (parsed.missions && Array.isArray(parsed.missions)) {
+                        activeMissionsList = parsed.missions;
                     }
                     if (parsed.pokemon && Array.isArray(parsed.pokemon)) {
                         activePokemonList = parsed.pokemon;
