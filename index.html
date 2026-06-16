@@ -72,7 +72,7 @@
     <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
         
         <!-- ================= MISSIONS TAB ================= -->
-        <section id="tab-content-missions" class="space-y-8 animate-fade-in">
+        <section id="tab-content-missions" class="space-y-8">
             <div class="bg-gradient-to-r from-slate-900 to-indigo-950/40 p-6 rounded-2xl border border-indigo-500/10 shadow-xl flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div>
                     <h2 class="text-xl font-bold mb-1 text-white flex items-center gap-2">
@@ -203,7 +203,7 @@
         </section>
 
         <!-- ================= DEX REGISTRY TAB ================= -->
-        <section id="tab-content-dex" class="hidden space-y-6 animate-fade-in">
+        <section id="tab-content-dex" class="hidden space-y-6">
             <!-- Fetch API Sync Banner -->
             <div id="sync-banner" class="bg-indigo-950/60 border border-indigo-500/30 p-6 rounded-2xl flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div class="space-y-1">
@@ -235,10 +235,10 @@
             <!-- Database Controls / Filtering -->
             <div class="bg-slate-900/60 border border-slate-800/80 p-5 rounded-2xl space-y-4">
                 <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
-                    <!-- Search Input -->
+                    <!-- Search Input with Debounce support -->
                     <div class="md:col-span-5 relative">
                         <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-500 pointer-events-none text-xs">🔍</span>
-                        <input type="text" id="dex-search" oninput="handleSearch()" placeholder="Search by name or national number..." class="w-full pl-9 pr-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition">
+                        <input type="text" id="dex-search" placeholder="Search by name or national number..." class="w-full pl-9 pr-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition">
                     </div>
 
                     <!-- Generation Filter -->
@@ -285,7 +285,7 @@
                 </div>
             </div>
 
-            <!-- Pokemon Cards Grid -->
+            <!-- Pokemon Cards Grid - Using Event Delegation in JS -->
             <div id="dex-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                 <!-- Javascript will inject paginated cards here -->
             </div>
@@ -305,14 +305,15 @@
         </section>
 
         <!-- ================= SYNC TAB ================= -->
-        <section id="tab-content-sync" class="hidden space-y-6 animate-fade-in">
+        <section id="tab-content-sync" class="hidden space-y-6">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <!-- Backup & Save block -->
                 <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-6 space-y-5">
                     <div class="space-y-1">
                         <span class="text-xl">📤</span>
                         <h3 class="text-base font-bold text-white mt-1">Export Quest Progress</h3>
-                        <p class="text-xs text-slate-400">Generate an encrypted hash of your current dashboard data. Copy this block to transfer your progress between computers or send it straight into our chatbox!</p>
+                        <p class="text-xs text-slate-400">Copy this raw configuration block to backup your progress across browsers or paste it to Gemini to sync your active quest routes.</p>
+                        <p class="text-[10px] text-yellow-500 font-semibold uppercase tracking-wider">⚠️ Note: Code string is serialized state representation, not a cryptographic security hash.</p>
                     </div>
                     <textarea id="sync-export-area" readonly class="w-full h-32 p-3 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-400 font-mono focus:outline-none resize-none select-all focus:border-indigo-500 transition"></textarea>
                     <button onclick="copyExportString()" class="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs rounded-xl transition duration-200 shadow-md shadow-indigo-600/10">
@@ -337,16 +338,47 @@
 
     </main>
 
-    <!-- Slide-in Toast Notifications -->
-    <div id="toast-wrapper" class="fixed bottom-5 right-5 z-50 space-y-2 pointer-events-none"></div>
+    <!-- Slide-in Toast Notifications (Using CSS Stacking Engine) -->
+    <div id="toast-wrapper" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none max-w-sm w-full"></div>
 
     <!-- Footer -->
-    <footer class="text-center py-8 text-[10px] text-slate-600 border-t border-slate-900 bg-slate-950/40">
+    <footer class="text-center py-8 text-[10px] text-slate-600 border-t border-slate-900 bg-slate-950/40 mt-auto">
         <p>PokeQuest Master Living Dex Dashboard • Hardware Companion Engine</p>
     </footer>
 
+    <!-- ================= JAVASCRIPT APP ENGINE ================= -->
     <script>
-        // Default Key High Priority Pokemon
+        
+        // Define global constants (Addresses Magic Numbers critique)
+        const GENERATION_RANGES = [
+            { gen: 1, min: 1, max: 151 },
+            { gen: 2, min: 152, max: 251 },
+            { gen: 3, min: 252, max: 386 },
+            { gen: 4, min: 387, max: 493 },
+            { gen: 5, min: 494, max: 649 },
+            { gen: 6, min: 650, max: 721 },
+            { gen: 7, min: 722, max: 809 },
+            { gen: 8, min: 810, max: 905 },
+            { gen: 9, min: 906, max: 1025 }
+        ];
+        const ITEMS_PER_PAGE = 48;
+        const DEFAULT_GAME_ORDER = ["Emerald", "Crystal", "Yellow", "Platinum", "HeartGold", "Black 2", "Ultra Moon", "Legends: Z-A", "Other"];
+
+        // Sanitization engine to prevent XSS (Addresses Input Sanitization critique)
+        function escapeHTML(str) {
+            if (typeof str !== 'string') return '';
+            return str.replace(/[&<>'"]/g, 
+                tag => ({
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    "'": '&#39;',
+                    '"': '&quot;'
+                }[tag] || tag)
+            );
+        }
+
+        // Lightweight fallback data to keep page loaded without server dependencies
         const defaultPokemonList = [
             { num: 1, name: "Bulbasaur", gen: 1, base: false, male: false, female: false, shiny: false, regional: false, form: false },
             { num: 19, name: "Rattata", gen: 1, base: false, male: false, female: false, shiny: false, regional: false, form: false },
@@ -359,7 +391,7 @@
             { num: 251, name: "Celebi", gen: 2, base: false, male: false, female: false, shiny: false, regional: false, form: false }
         ];
 
-        // Dynamic Campaigns List mapped precisely to your exact cartridge library
+        // Custom default missions mapped precisely to absolute hardware constraints
         const defaultMissions = [
             {
                 id: "m_emerald_cloning",
@@ -532,9 +564,9 @@
 
         // Pagination State & Active Filter State
         let currentPage = 1;
-        const itemsPerPage = 48;
         let filteredPokemon = [];
         let activeMissionFilter = 'all';
+
 
         window.onload = function() {
             loadLocalState();
@@ -543,7 +575,40 @@
             calculateProgress();
             renderMissions();
             applyFiltersAndRender();
+            
+            // Debounced Search Event Listener (Addresses Debounce Search critique)
+            const searchInput = document.getElementById('dex-search');
+            if (searchInput) {
+                searchInput.addEventListener('input', debounce(() => {
+                    currentPage = 1;
+                    applyFiltersAndRender();
+                }, 250));
+            }
+
+            // Event Delegation Listener for Pokemon Registry Buttons (Addresses Event Delegation critique)
+            const dexGrid = document.getElementById('dex-grid');
+            if (dexGrid) {
+                dexGrid.addEventListener('click', (event) => {
+                    const btn = event.target.closest('[data-pnum]');
+                    if (btn) {
+                        const pNum = parseInt(btn.getAttribute('data-pnum'), 10);
+                        const key = btn.getAttribute('data-key');
+                        if (pNum && key) {
+                            toggleCardStat(pNum, key);
+                        }
+                    }
+                });
+            }
         };
+
+        // Standard Utility Debounce Logic
+        function debounce(func, delay) {
+            let timer;
+            return function(...args) {
+                clearTimeout(timer);
+                timer = setTimeout(() => func.apply(this, args), delay);
+            };
+        }
 
         // Navigation Controller
         function switchTab(tabId) {
@@ -566,28 +631,34 @@
             }
         }
 
-        // Custom Toast system
+
+        // Advanced queuing system to cleanly manage multiple toast notifications (Addresses Toast Queue critique)
         function triggerToast(message, type = 'info') {
             const wrapper = document.getElementById('toast-wrapper');
+            if (!wrapper) return;
+
             const toast = document.createElement('div');
             
-            let colorClasses = "bg-slate-900 border-slate-800 text-white";
+            let colorClasses = "bg-slate-900 border-slate-800 text-white shadow-slate-950/50";
             let icon = "💡";
+            
             if (type === 'success') {
-                colorClasses = "bg-emerald-950/90 border-emerald-500/30 text-emerald-300";
+                colorClasses = "bg-emerald-950/90 border-emerald-500/30 text-emerald-300 shadow-emerald-950/20";
                 icon = "✨";
             } else if (type === 'error') {
-                colorClasses = "bg-rose-950/90 border-rose-500/30 text-rose-300";
+                colorClasses = "bg-rose-950/90 border-rose-500/30 text-rose-300 shadow-rose-950/20";
                 icon = "🚨";
             }
 
-            toast.className = `flex items-center space-x-3 border p-4 rounded-xl shadow-2xl pointer-events-auto transition-all duration-300 transform translate-y-2 opacity-0 ${colorClasses}`;
-            toast.innerHTML = `<span class="text-base">${icon}</span><span class="text-xs font-semibold">${message}</span>`;
+            toast.className = `flex items-center space-x-3 border p-4 rounded-xl shadow-2xl transition-all duration-300 transform translate-y-2 opacity-0 pointer-events-auto ${colorClasses}`;
+            toast.innerHTML = `<span class="text-base shrink-0">${icon}</span><span class="text-xs font-semibold leading-normal">${escapeHTML(message)}</span>`;
             
             wrapper.appendChild(toast);
-            setTimeout(() => {
-                toast.classList.remove('translate-y-2', 'opacity-0');
-            }, 50);
+            
+            // Force browser layout repaint to trigger CSS animation
+            toast.offsetHeight; 
+
+            toast.classList.remove('translate-y-2', 'opacity-0');
 
             setTimeout(() => {
                 toast.classList.add('translate-y-2', 'opacity-0');
@@ -595,15 +666,28 @@
             }, 3000);
         }
 
+
         function saveLocalState() {
-            const packageObj = {
-                missions: activeMissionsList,
-                pokemon: activePokemonList
-            };
-            localStorage.setItem('poke_quest_data_v2', JSON.stringify(packageObj));
-            refreshSyncAreas();
-            updateStatsSummary();
-            calculateProgress();
+            try {
+                const packageObj = {
+                    missions: activeMissionsList,
+                    pokemon: activePokemonList
+                };
+                localStorage.setItem('poke_quest_data_v2', JSON.stringify(packageObj));
+                refreshSyncAreas();
+                updateStatsSummary();
+                calculateProgress();
+            } catch (err) {
+                triggerToast("Unable to save current session to browser memory.", 'error');
+            }
+        }
+
+        function validateSchema(data) {
+            // High-fidelity schema validation (Addresses State Validation critique)
+            if (!data || typeof data !== 'object') return false;
+            if (data.pokemon && !Array.isArray(data.pokemon)) return false;
+            if (data.missions && !Array.isArray(data.missions)) return false;
+            return true;
         }
 
         function loadLocalState() {
@@ -611,14 +695,12 @@
             if (savedRaw) {
                 try {
                     const packageObj = JSON.parse(savedRaw);
-                    if (packageObj.pokemon && Array.isArray(packageObj.pokemon) && packageObj.pokemon.length > 0) {
-                        activePokemonList = packageObj.pokemon;
-                    }
-                    if (packageObj.missions) {
-                        if (Array.isArray(packageObj.missions)) {
-                            // Map incoming missions to ensure they have complete structural properties
+                    if (validateSchema(packageObj)) {
+                        if (packageObj.pokemon && packageObj.pokemon.length > 0) {
+                            activePokemonList = packageObj.pokemon;
+                        }
+                        if (packageObj.missions) {
                             activeMissionsList = packageObj.missions.map(m => {
-                                // Default game classification fallback
                                 if (!m.game) {
                                     if (m.tag.includes("Emerald")) m.game = "Emerald";
                                     else if (m.tag.includes("Crystal")) m.game = "Crystal";
@@ -635,20 +717,20 @@
                         }
                     }
                 } catch (e) {
-                    console.error("Local recovery error", e);
+                    console.error("Local state recovery error", e);
                 }
             }
         }
 
         function toggleCreateMissionPanel() {
             const panel = document.getElementById('create-mission-panel');
-            panel.classList.toggle('hidden');
+            if (panel) panel.classList.toggle('hidden');
         }
 
+
         function calculateProgress() {
-            const activeGamesList = ["Emerald", "Crystal", "Yellow", "Platinum", "HeartGold", "Black 2", "Ultra Moon", "Legends: Z-A", "Other"];
             const gameStats = {};
-            activeGamesList.forEach(g => {
+            DEFAULT_GAME_ORDER.forEach(g => {
                 gameStats[g] = { total: 0, completed: 0 };
             });
 
@@ -672,11 +754,16 @@
 
             // Calculate overall percentage
             const overallPercent = globalTotal > 0 ? Math.round((globalCompleted / globalTotal) * 100) : 0;
-            document.getElementById('overall-progress-bar').style.width = `${overallPercent}%`;
-            document.getElementById('overall-progress-text').innerText = `${overallPercent}% (${globalCompleted}/${globalTotal})`;
+            const overallBar = document.getElementById('overall-progress-bar');
+            if (overallBar) overallBar.style.width = `${overallPercent}%`;
+            
+            const overallText = document.getElementById('overall-progress-text');
+            if (overallText) overallText.innerText = `${overallPercent}% (${globalCompleted}/${globalTotal})`;
 
             // Render hardware channels progress grid
             const statsGrid = document.getElementById('game-progress-grid');
+            if (!statsGrid) return;
+            
             statsGrid.innerHTML = "";
 
             const gameEmojis = {
@@ -703,9 +790,9 @@
                 "Other": "slate"
             };
 
-            activeGamesList.forEach(game => {
+            DEFAULT_GAME_ORDER.forEach(game => {
                 const stats = gameStats[game];
-                if (stats.total === 0) return; // Hide games with zero assigned missions
+                if (!stats || stats.total === 0) return; // Hide empty targets
 
                 const percent = Math.round((stats.completed / stats.total) * 100);
                 const color = gameColors[game] || "slate";
@@ -733,6 +820,7 @@
                 statsGrid.appendChild(channelCard);
             });
         }
+
 
         function filterMissionsBy(game) {
             activeMissionFilter = game;
@@ -764,16 +852,16 @@
             renderMissions();
         }
 
-        // Dynamic Mission Creation Action
+        // Dynamic Mission Creation Action (With HTML Input Sanitization)
         function createNewMission(event) {
             event.preventDefault();
-            const title = document.getElementById('new-m-title').value.trim();
-            const game = document.getElementById('new-m-game').value;
-            const platform = document.getElementById('new-m-platform').value.trim();
-            const tag = document.getElementById('new-m-tag').value.trim();
-            const color = document.getElementById('new-m-color').value;
-            const emoji = document.getElementById('new-m-emoji').value.trim();
-            const desc = document.getElementById('new-m-desc').value.trim();
+            const title = escapeHTML(document.getElementById('new-m-title').value.trim());
+            const game = escapeHTML(document.getElementById('new-m-game').value);
+            const platform = escapeHTML(document.getElementById('new-m-platform').value.trim());
+            const tag = escapeHTML(document.getElementById('new-m-tag').value.trim());
+            const color = escapeHTML(document.getElementById('new-m-color').value);
+            const emoji = escapeHTML(document.getElementById('new-m-emoji').value.trim());
+            const desc = escapeHTML(document.getElementById('new-m-desc').value.trim());
             const tasksRaw = document.getElementById('new-m-tasks').value.split('\n').map(t => t.trim()).filter(Boolean);
 
             if (tasksRaw.length === 0) {
@@ -785,7 +873,7 @@
             const processedTasks = tasksRaw.map((text, idx) => {
                 return {
                     id: `${missionId}_t${idx}`,
-                    text: text,
+                    text: escapeHTML(text),
                     checked: false
                 };
             });
@@ -813,6 +901,8 @@
 
         function deleteMission(missionId) {
             const btn = document.getElementById(`del-btn-${missionId}`);
+            if (!btn) return;
+
             if (btn.dataset.confirm === "true") {
                 activeMissionsList = activeMissionsList.filter(m => m.id !== missionId);
                 saveLocalState();
@@ -821,13 +911,14 @@
             } else {
                 btn.dataset.confirm = "true";
                 btn.innerText = "⚠️ Confirm?";
-                btn.classList.add('bg-rose-600', 'text-white', 'border-transparent');
+                btn.className = "absolute top-4 right-4 h-8 px-2.5 rounded-lg border border-transparent bg-rose-600 text-white flex items-center justify-center text-xs font-bold transition duration-200 shadow-md shadow-rose-600/20";
                 
                 setTimeout(() => {
-                    if (btn) {
-                        btn.dataset.confirm = "false";
-                        btn.innerText = "🗑️";
-                        btn.classList.remove('bg-rose-600', 'text-white', 'border-transparent');
+                    const activeBtn = document.getElementById(`del-btn-${missionId}`);
+                    if (activeBtn) {
+                        activeBtn.dataset.confirm = "false";
+                        activeBtn.innerText = "🗑️";
+                        activeBtn.className = "absolute top-4 right-4 h-8 w-8 rounded-lg border border-slate-800 bg-slate-950 text-slate-500 hover:text-rose-400 flex items-center justify-center text-xs transition duration-200";
                     }
                 }, 3000);
             }
@@ -835,9 +926,10 @@
 
         function renderMissions() {
             const grid = document.getElementById('missions-grid');
+            if (!grid) return;
+            
             grid.innerHTML = "";
 
-            // Filter active list based on filter index
             const displayList = activeMissionsList.filter(m => {
                 if (activeMissionFilter === 'all') return true;
                 return m.game === activeMissionFilter;
@@ -868,8 +960,8 @@
                 const tasksHTML = m.tasks.map(t => {
                     return `
                         <li class="flex items-start space-x-3 text-xs text-slate-300">
-                            <input type="checkbox" onchange="toggleDynamicTask('${m.id}', '${t.id}')" ${t.checked ? 'checked' : ''} class="mt-0.5 h-4 w-4 rounded border-slate-700 bg-slate-800 text-indigo-500 focus:ring-0 focus:ring-offset-0 transition cursor-pointer">
-                            <span class="cursor-pointer select-none ${t.checked ? 'line-through text-slate-500 italic' : ''}">${t.text}</span>
+                            <input type="checkbox" onchange="toggleDynamicTask('${escapeHTML(m.id)}', '${escapeHTML(t.id)}')" ${t.checked ? 'checked' : ''} class="mt-0.5 h-4 w-4 rounded border-slate-700 bg-slate-800 text-indigo-500 focus:ring-0 focus:ring-offset-0 transition cursor-pointer">
+                            <span class="cursor-pointer select-none ${t.checked ? 'line-through text-slate-500 italic' : ''}">${escapeHTML(t.text)}</span>
                         </li>
                     `;
                 }).join('');
@@ -878,18 +970,18 @@
                     <div>
                         <div class="flex items-start justify-between mb-4 pr-10">
                             <div>
-                                <span class="${colorClass} text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider border">${m.tag}</span>
-                                <h3 class="text-base font-bold text-white mt-2">${m.title}</h3>
-                                <p class="text-xs text-slate-400 mt-1">Platform: <strong>${m.platform}</strong></p>
+                                <span class="${colorClass} text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider border">${escapeHTML(m.tag)}</span>
+                                <h3 class="text-base font-bold text-white mt-2">${escapeHTML(m.title)}</h3>
+                                <p class="text-xs text-slate-400 mt-1">Platform: <strong>${escapeHTML(m.platform)}</strong></p>
                             </div>
-                            <span class="text-3xl">${m.emoji}</span>
+                            <span class="text-3xl">${escapeHTML(m.emoji)}</span>
                         </div>
-                        <p class="text-xs text-slate-300 leading-relaxed mb-5">${m.desc}</p>
+                        <p class="text-xs text-slate-300 leading-relaxed mb-5">${escapeHTML(m.desc)}</p>
                         <ul class="space-y-3 border-t border-slate-800/80 pt-4">
                             ${tasksHTML}
                         </ul>
                     </div>
-                    <button id="del-btn-${m.id}" onclick="deleteMission('${m.id}')" class="absolute top-4 right-4 h-8 w-8 rounded-lg border border-slate-800 bg-slate-950 text-slate-500 hover:text-rose-400 flex items-center justify-center text-xs transition duration-200" title="Delete Mission">
+                    <button id="del-btn-${escapeHTML(m.id)}" onclick="deleteMission('${escapeHTML(m.id)}')" class="absolute top-4 right-4 h-8 w-8 rounded-lg border border-slate-800 bg-slate-950 text-slate-500 hover:text-rose-400 flex items-center justify-center text-xs transition duration-200" title="Delete Mission">
                         🗑️
                     </button>
                 `;
@@ -910,32 +1002,41 @@
             }
         }
 
+
         async function syncAllFromPokeAPI() {
             const syncBtn = document.getElementById('api-sync-btn');
             const progressWrapper = document.getElementById('api-progress-wrapper');
             const syncBanner = document.getElementById('sync-banner');
             
+            if (!syncBtn || !progressWrapper) return;
+            
             syncBtn.disabled = true;
             progressWrapper.classList.remove('hidden');
             
-            document.getElementById('api-progress-bar').style.width = '5%';
-            document.getElementById('api-progress-percent').innerText = '5%';
-            document.getElementById('api-progress-label').innerText = "Connecting to PokeAPI servers...";
+            const pBar = document.getElementById('api-progress-bar');
+            const pPercent = document.getElementById('api-progress-percent');
+            const pLabel = document.getElementById('api-progress-label');
+
+            pBar.style.width = '5%';
+            pPercent.innerText = '5%';
+            pLabel.innerText = "Connecting to PokeAPI servers...";
 
             try {
+                // Fetch All National species inside one comprehensive payload
                 const response = await fetch('https://pokeapi.co/api/v2/pokemon-species/?limit=1025');
-                if (!response.ok) throw new Error("Connection failed");
+                if (!response.ok) throw new Error("HTTP Connection Error inside PokeAPI network");
+                
                 const data = await response.json();
                 
-                document.getElementById('api-progress-bar').style.width = '20%';
-                document.getElementById('api-progress-percent').innerText = '20%';
-                document.getElementById('api-progress-label').innerText = "Sorting National Pokédex data...";
+                pBar.style.width = '20%';
+                pPercent.innerText = '20%';
+                pLabel.innerText = "Sorting National Pokédex data...";
 
                 const results = data.results;
                 
                 const fetchedPokemon = results.map((item) => {
                     const urlParts = item.url.split('/').filter(Boolean);
-                    const num = parseInt(urlParts[urlParts.length - 1]);
+                    const num = parseInt(urlParts[urlParts.length - 1], 10);
                     const nameRaw = item.name;
                     
                     const cleanName = nameRaw
@@ -943,16 +1044,14 @@
                         .map(word => word.charAt(0).toUpperCase() + word.slice(1))
                         .join(' ');
 
-                    // Correct generational mapping thresholds
-                    let gen = 1;
-                    if (num > 151) gen = 2;
-                    if (num > 251) gen = 3;
-                    if (num > 386) gen = 4;
-                    if (num > 493) gen = 5;
-                    if (num > 649) gen = 6;
-                    if (num > 721) gen = 7;
-                    if (num > 809) gen = 8;
-                    if (num > 905) gen = 9;
+                    // Correct generational mapping thresholds (Addresses generation thresholds magic numbers critique)
+                    let gen = 9;
+                    for (const r of GENERATION_RANGES) {
+                        if (num <= r.max) {
+                            gen = r.gen;
+                            break;
+                        }
+                    }
 
                     return {
                         num: num,
@@ -969,9 +1068,9 @@
 
                 fetchedPokemon.sort((a, b) => a.num - b.num);
 
-                document.getElementById('api-progress-bar').style.width = '60%';
-                document.getElementById('api-progress-percent').innerText = '60%';
-                document.getElementById('api-progress-label').innerText = "Merging local user changes...";
+                pBar.style.width = '60%';
+                pPercent.innerText = '60%';
+                pLabel.innerText = "Merging local user changes...";
 
                 const stateMap = {};
                 activePokemonList.forEach(p => {
@@ -993,13 +1092,13 @@
                     return p;
                 });
 
-                document.getElementById('api-progress-bar').style.width = '100%';
-                document.getElementById('api-progress-percent').innerText = '100%';
-                document.getElementById('api-progress-label').innerText = "Sync Complete!";
+                pBar.style.width = '100%';
+                pPercent.innerText = '100%';
+                pLabel.innerText = "Sync Complete!";
 
                 setTimeout(() => {
                     progressWrapper.classList.add('hidden');
-                    syncBanner.classList.add('hidden');
+                    if (syncBanner) syncBanner.classList.add('hidden');
                     saveLocalState();
                     applyFiltersAndRender();
                     triggerToast("1,025 Database synced perfectly!", 'success');
@@ -1009,12 +1108,15 @@
                 console.error(error);
                 progressWrapper.classList.add('hidden');
                 syncBtn.disabled = false;
-                triggerToast("Sync error! Network request timed out.", 'error');
+                triggerToast("Sync error! Network request timed out or was blocked.", 'error');
             }
         }
 
+
         function applyFiltersAndRender() {
-            const query = document.getElementById('dex-search').value.toLowerCase().trim();
+            const queryElement = document.getElementById('dex-search');
+            const query = queryElement ? queryElement.value.toLowerCase().trim() : '';
+            
             const genFilter = document.getElementById('dex-gen-filter').value;
             const stateFilter = document.getElementById('dex-state-filter').value;
 
@@ -1034,7 +1136,7 @@
                 return matchSearch && matchGen && matchState;
             });
 
-            const maxPages = Math.ceil(filteredPokemon.length / itemsPerPage) || 1;
+            const maxPages = Math.ceil(filteredPokemon.length / ITEMS_PER_PAGE) || 1;
             if (currentPage > maxPages) currentPage = maxPages;
 
             renderPage();
@@ -1042,11 +1144,13 @@
 
         function renderPage() {
             const grid = document.getElementById('dex-grid');
+            if (!grid) return;
+            
             grid.innerHTML = "";
 
             const total = filteredPokemon.length;
-            const startIdx = (currentPage - 1) * itemsPerPage;
-            const endIdx = Math.min(startIdx + itemsPerPage, total);
+            const startIdx = (currentPage - 1) * ITEMS_PER_PAGE;
+            const endIdx = Math.min(startIdx + ITEMS_PER_PAGE, total);
 
             document.getElementById('pagination-info').innerText = `Showing ${total > 0 ? startIdx + 1 : 0} - ${endIdx} of ${total} entries`;
             document.getElementById('btn-prev-page').disabled = (currentPage === 1);
@@ -1066,42 +1170,43 @@
                     "bg-teal-500/10 text-teal-400 border-teal-500/20"
                 ];
 
+                // Rendered buttons use data properties for event delegation
                 card.innerHTML = `
                     <div class="flex items-center justify-between mb-3">
                         <div class="flex items-center space-x-2">
                             <span class="text-xs text-slate-500 font-mono font-semibold">#${p.num.toString().padStart(3, '0')}</span>
-                            <h4 class="text-sm font-bold text-white tracking-wide">${p.name}</h4>
+                            <h4 class="text-sm font-bold text-white tracking-wide">${escapeHTML(p.name)}</h4>
                         </div>
                         <span class="text-[10px] px-2 py-0.5 font-bold rounded-full border ${genBadgeColors[p.gen] || ''}">G${p.gen}</span>
                     </div>
                     
                     <div class="grid grid-cols-3 gap-1.5 mt-2">
-                        <button onclick="toggleCardStat(${p.num}, 'base')" class="px-2 py-1.5 rounded-lg border text-[10px] font-bold transition flex flex-col items-center gap-0.5 cursor-pointer ${p.base ? 'bg-teal-500/20 border-teal-500/40 text-teal-300 shadow-md shadow-teal-500/5' : 'bg-slate-950 border-slate-800 text-slate-500 hover:text-slate-300'}">
+                        <button data-pnum="${p.num}" data-key="base" class="px-2 py-1.5 rounded-lg border text-[10px] font-bold transition flex flex-col items-center gap-0.5 cursor-pointer ${p.base ? 'bg-teal-500/20 border-teal-500/40 text-teal-300 shadow-md shadow-teal-500/5' : 'bg-slate-950 border-slate-800 text-slate-500 hover:text-slate-300'}">
                             <span>✅</span>
                             <span>Caught</span>
                         </button>
 
-                        <button onclick="toggleCardStat(${p.num}, 'male')" class="px-2 py-1.5 rounded-lg border text-[10px] font-bold transition flex flex-col items-center gap-0.5 cursor-pointer ${p.male ? 'bg-blue-500/20 border-blue-500/40 text-blue-300' : 'bg-slate-950 border-slate-800 text-slate-500 hover:text-slate-300'}">
+                        <button data-pnum="${p.num}" data-key="male" class="px-2 py-1.5 rounded-lg border text-[10px] font-bold transition flex flex-col items-center gap-0.5 cursor-pointer ${p.male ? 'bg-blue-500/20 border-blue-500/40 text-blue-300' : 'bg-slate-950 border-slate-800 text-slate-500 hover:text-slate-300'}">
                             <span>♂</span>
                             <span>Male</span>
                         </button>
 
-                        <button onclick="toggleCardStat(${p.num}, 'female')" class="px-2 py-1.5 rounded-lg border text-[10px] font-bold transition flex flex-col items-center gap-0.5 cursor-pointer ${p.female ? 'bg-pink-500/20 border-pink-500/40 text-pink-300' : 'bg-slate-950 border-slate-800 text-slate-500 hover:text-slate-300'}">
+                        <button data-pnum="${p.num}" data-key="female" class="px-2 py-1.5 rounded-lg border text-[10px] font-bold transition flex flex-col items-center gap-0.5 cursor-pointer ${p.female ? 'bg-pink-500/20 border-pink-500/40 text-pink-300' : 'bg-slate-950 border-slate-800 text-slate-500 hover:text-slate-300'}">
                             <span>♀</span>
                             <span>Female</span>
                         </button>
 
-                        <button onclick="toggleCardStat(${p.num}, 'shiny')" class="px-2 py-1.5 rounded-lg border text-[10px] font-bold transition flex flex-col items-center gap-0.5 cursor-pointer ${p.shiny ? 'bg-amber-500/20 border-amber-500/40 text-amber-300 shadow-md shadow-amber-500/5' : 'bg-slate-950 border-slate-800 text-slate-500 hover:text-slate-300'}">
+                        <button data-pnum="${p.num}" data-key="shiny" class="px-2 py-1.5 rounded-lg border text-[10px] font-bold transition flex flex-col items-center gap-0.5 cursor-pointer ${p.shiny ? 'bg-amber-500/20 border-amber-500/40 text-amber-300 shadow-md shadow-amber-500/5' : 'bg-slate-950 border-slate-800 text-slate-500 hover:text-slate-300'}">
                             <span>✨</span>
                             <span>Shiny</span>
                         </button>
 
-                        <button onclick="toggleCardStat(${p.num}, 'regional')" class="px-2 py-1.5 rounded-lg border text-[10px] font-bold transition flex flex-col items-center gap-0.5 cursor-pointer ${p.regional ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-300' : 'bg-slate-950 border-slate-800 text-slate-500 hover:text-slate-300'}">
+                        <button data-pnum="${p.num}" data-key="regional" class="px-2 py-1.5 rounded-lg border text-[10px] font-bold transition flex flex-col items-center gap-0.5 cursor-pointer ${p.regional ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-300' : 'bg-slate-950 border-slate-800 text-slate-500 hover:text-slate-300'}">
                             <span>🌴</span>
                             <span>Regional</span>
                         </button>
 
-                        <button onclick="toggleCardStat(${p.num}, 'form')" class="px-2 py-1.5 rounded-lg border text-[10px] font-bold transition flex flex-col items-center gap-0.5 cursor-pointer ${p.form ? 'bg-purple-500/20 border-purple-500/40 text-purple-300' : 'bg-slate-950 border-slate-800 text-slate-500 hover:text-slate-300'}">
+                        <button data-pnum="${p.num}" data-key="form" class="px-2 py-1.5 rounded-lg border text-[10px] font-bold transition flex flex-col items-center gap-0.5 cursor-pointer ${p.form ? 'bg-purple-500/20 border-purple-500/40 text-purple-300' : 'bg-slate-950 border-slate-800 text-slate-500 hover:text-slate-300'}">
                             <span>🌀</span>
                             <span>Form</span>
                         </button>
@@ -1110,6 +1215,7 @@
                 grid.appendChild(card);
             });
         }
+
 
         function toggleCardStat(pNum, key) {
             const idx = activePokemonList.findIndex(p => p.num === pNum);
@@ -1123,11 +1229,6 @@
                 saveLocalState();
                 applyFiltersAndRender();
             }
-        }
-
-        function handleSearch() {
-            currentPage = 1;
-            applyFiltersAndRender();
         }
 
         function handleGenFilter() {
@@ -1149,7 +1250,7 @@
         }
 
         function nextPage() {
-            const maxPages = Math.ceil(filteredPokemon.length / itemsPerPage);
+            const maxPages = Math.ceil(filteredPokemon.length / ITEMS_PER_PAGE);
             if (currentPage < maxPages) {
                 currentPage++;
                 applyFiltersAndRender();
@@ -1158,10 +1259,14 @@
         }
 
         function updateStatsSummary() {
-            document.getElementById('stat-total-pokemon').innerText = activePokemonList.length;
+            const totalEl = document.getElementById('stat-total-pokemon');
+            const baseEl = document.getElementById('stat-base-caught');
+            const formEl = document.getElementById('stat-total-forms');
+
+            if (totalEl) totalEl.innerText = activePokemonList.length;
             
             const baseCaughtCount = activePokemonList.filter(p => p.base).length;
-            document.getElementById('stat-base-caught').innerText = baseCaughtCount;
+            if (baseEl) baseEl.innerText = baseCaughtCount;
 
             let formsCount = 0;
             activePokemonList.forEach(p => {
@@ -1171,24 +1276,32 @@
                 if (p.regional) formsCount++;
                 if (p.form) formsCount++;
             });
-            document.getElementById('stat-total-forms').innerText = formsCount;
+            if (formEl) formEl.innerText = formsCount;
         }
 
         function refreshSyncAreas() {
-            const packageObj = {
-                missions: activeMissionsList,
-                pokemon: activePokemonList
-            };
-            const rawStr = JSON.stringify(packageObj);
-            const encoded = btoa(unescape(encodeURIComponent(rawStr)));
-            document.getElementById('sync-export-area').value = encoded;
+            try {
+                const packageObj = {
+                    missions: activeMissionsList,
+                    pokemon: activePokemonList
+                };
+                const rawStr = JSON.stringify(packageObj);
+                const encoded = btoa(unescape(encodeURIComponent(rawStr)));
+                
+                const exportArea = document.getElementById('sync-export-area');
+                if (exportArea) exportArea.value = encoded;
+            } catch (err) {
+                console.error("Unable to generate export string", err);
+            }
         }
 
         function copyExportString() {
             const area = document.getElementById('sync-export-area');
-            area.select();
-            document.execCommand('copy');
-            triggerToast("Sync string copied safely to clipboard!", 'success');
+            if (area) {
+                area.select();
+                document.execCommand('copy');
+                triggerToast("Sync string copied safely to clipboard!", 'success');
+            }
         }
 
         function importSyncString() {
@@ -1202,7 +1315,7 @@
                 const decodedRaw = decodeURIComponent(escape(atob(input)));
                 const parsed = JSON.parse(decodedRaw);
                 
-                if (parsed.missions || parsed.pokemon) {
+                if (validateSchema(parsed)) {
                     if (parsed.missions && Array.isArray(parsed.missions)) {
                         activeMissionsList = parsed.missions;
                     }
@@ -1213,10 +1326,13 @@
                     saveLocalState();
                     renderMissions();
                     applyFiltersAndRender();
-                    document.getElementById('sync-import-area').value = "";
+                    
+                    const importArea = document.getElementById('sync-import-area');
+                    if (importArea) importArea.value = "";
+                    
                     triggerToast("Sync data loaded successfully!", 'success');
                 } else {
-                    throw new Error("Invalid structures");
+                    throw new Error("Invalid structure formats parsed in system memory");
                 }
             } catch (e) {
                 console.error(e);
