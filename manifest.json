@@ -1,0 +1,91 @@
+{
+  "name": "PokeQuest Living Dex",
+  "short_name": "PokeQuest",
+  "description": "Offline-first Pokémon campaign tracker and Pokédex manager for Living Dex runs",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "theme_color": "#0b0f19",
+  "background_color": "#0b0f19",
+  "prefer_related_applications": false,
+  "screenshots": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 540 720'><rect fill='%230b0f19' width='540' height='720'/><text x='270' y='360' font-size='120' text-anchor='middle' dominant-baseline='central' font-family='system-ui'>🌟</text></svg>",
+      "sizes": "540x720",
+      "type": "image/svg+xml",
+      "form_factor": "narrow"
+    },
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1280 720'><rect fill='%230b0f19' width='1280' height='720'/><text x='640' y='360' font-size='120' text-anchor='middle' dominant-baseline='central' font-family='system-ui'>🌟</text></svg>",
+      "sizes": "1280x720",
+      "type": "image/svg+xml",
+      "form_factor": "wide"
+    }
+  ],
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%230b0f19' width='192' height='192' rx='45'/><text x='96' y='96' font-size='100' text-anchor='middle' dominant-baseline='central' font-family='system-ui'>🌟</text></svg>",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%234f46e5' width='192' height='192' rx='45'/><text x='96' y='96' font-size='100' text-anchor='middle' dominant-baseline='central' font-family='system-ui'>🌟</text></svg>",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    },
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect fill='%230b0f19' width='512' height='512' rx='120'/><text x='256' y='256' font-size='280' text-anchor='middle' dominant-baseline='central' font-family='system-ui'>🌟</text></svg>",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect fill='%234f46e5' width='512' height='512' rx='120'/><text x='256' y='256' font-size='280' text-anchor='middle' dominant-baseline='central' font-family='system-ui'>🌟</text></svg>",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Create Mission",
+      "short_name": "New Mission",
+      "description": "Create a new campaign mission",
+      "url": "/?tab=missions",
+      "icons": [
+        {
+          "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'><rect fill='%234f46e5' width='96' height='96' rx='20'/><text x='48' y='48' font-size='50' text-anchor='middle' dominant-baseline='central'>⚔️</text></svg>",
+          "sizes": "96x96",
+          "type": "image/svg+xml"
+        }
+      ]
+    },
+    {
+      "name": "View Pokédex",
+      "short_name": "Pokédex",
+      "description": "View your Pokédex tracker",
+      "url": "/?tab=dex",
+      "icons": [
+        {
+          "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'><rect fill='%239333ea' width='96' height='96' rx='20'/><text x='48' y='48' font-size='50' text-anchor='middle' dominant-baseline='central'>🗃️</text></svg>",
+          "sizes": "96x96",
+          "type": "image/svg+xml"
+        }
+      ]
+    }
+  ],
+  "categories": ["productivity", "games"],
+  "screenshots_descriptions": [
+    {
+      "name": "Campaign Dashboard",
+      "description": "Track your Pokémon Living Dex progress across multiple games"
+    },
+    {
+      "name": "Desktop View",
+      "description": "Full campaign management on desktop and tablet devices"
+    }
+  ]
+}
