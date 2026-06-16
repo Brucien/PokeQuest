@@ -6,7 +6,6 @@
     <meta name="theme-color" content="#0b0f19">
     <meta name="description" content="PokeQuest Living Dex - Offline Pokémon campaign tracker and Pokédex manager">
     
-    <!-- PWA Configuration -->
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -16,7 +15,6 @@
     <title>PokeQuest Living Dex</title>
     <link rel="stylesheet" href="styles.css">
     
-    <!-- Fallback for fonts (system fonts as primary) -->
     <style>
         @font-face {
             font-family: 'Inter';
@@ -29,7 +27,6 @@
 </head>
 <body class="text-slate-100 bg-slate-950 min-h-screen flex flex-col selection:bg-indigo-500 selection:text-white">
 
-    <!-- Header with Mobile Navigation -->
     <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-40 transition-all">
         <div class="w-full px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
             <div class="flex items-center gap-3 flex-1 min-w-0">
@@ -42,14 +39,12 @@
                 </div>
             </div>
             
-            <!-- Mobile Menu Toggle -->
             <button id="nav-toggle" class="md:hidden p-2 rounded-lg hover:bg-slate-800 transition ml-2 flex-shrink-0" aria-label="Toggle navigation" aria-expanded="false">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
                 </svg>
             </button>
 
-            <!-- Desktop Navigation -->
             <nav id="nav-menu" class="hidden md:flex space-x-1 bg-slate-950 p-1 rounded-xl border border-slate-800/80" role="tablist" aria-label="Main navigation">
                 <button data-tab="missions" id="tab-btn-missions" class="px-4 py-1.5 text-xs font-semibold rounded-lg transition-all duration-200 bg-indigo-600 text-white shadow-md shadow-indigo-600/20" role="tab" aria-selected="true" aria-controls="tab-content-missions">
                     🗺️ <span class="hidden sm:inline">Missions</span>
@@ -63,7 +58,6 @@
             </nav>
         </div>
 
-        <!-- Mobile Navigation Menu -->
         <nav id="mobile-nav" class="hidden md:hidden border-t border-slate-800 bg-slate-900 p-3 space-y-2">
             <button data-tab="missions" id="tab-btn-missions-mobile" class="w-full text-left px-4 py-2.5 text-sm font-semibold rounded-lg bg-indigo-600 text-white transition-all" role="tab" aria-selected="true" aria-controls="tab-content-missions">
                 🗺️ Missions
@@ -77,12 +71,9 @@
         </nav>
     </header>
 
-    <!-- Main Content -->
     <main class="flex-grow w-full px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         
-        <!-- MISSIONS TAB -->
         <section id="tab-content-missions" class="space-y-6 sm:space-y-8" role="tabpanel" aria-labelledby="tab-btn-missions">
-            <!-- Campaign Dashboard Header -->
             <div class="bg-gradient-to-r from-slate-900 to-indigo-950/40 p-4 sm:p-6 rounded-2xl border border-indigo-500/10 shadow-xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div class="min-w-0">
                     <h2 class="text-lg sm:text-xl font-bold mb-1 sm:mb-2 text-white flex items-center gap-2">
@@ -97,7 +88,6 @@
                 </button>
             </div>
 
-            <!-- Progress Overview -->
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 bg-slate-900/40 border border-slate-800/80 p-4 sm:p-6 rounded-2xl">
                 <div class="lg:col-span-1 flex flex-col justify-between space-y-4">
                     <div>
@@ -117,12 +107,10 @@
                 <div class="lg:col-span-2 space-y-3">
                     <h3 class="text-xs font-extrabold tracking-wider text-slate-400 uppercase">Active Hardware Channels</h3>
                     <div id="game-progress-grid" class="grid grid-cols-2 sm:grid-cols-3 gap-3" role="region" aria-label="Game progress overview">
-                        <!-- Populated by JavaScript -->
-                    </div>
+                        </div>
                 </div>
             </div>
 
-            <!-- Create Mission Panel -->
             <div id="create-mission-panel" class="hidden bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-6 space-y-4">
                 <div class="border-b border-slate-800 pb-3 flex items-center justify-between gap-2">
                     <h3 class="text-sm font-bold text-white flex items-center gap-2">⚔️ Forge Quest</h3>
@@ -191,7 +179,6 @@
                 </form>
             </div>
 
-            <!-- Filter Section -->
             <div class="border-t border-slate-800/60 pt-4 sm:pt-6">
                 <span class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5 mb-3">
                     <span>⚡</span> Filter Campaigns
@@ -205,24 +192,77 @@
                 </div>
             </div>
 
-            <!-- Missions List -->
             <div id="missions-list" class="space-y-3">
-                <!-- Populated by JavaScript -->
-            </div>
+                </div>
         </section>
 
-        <!-- DEX TAB -->
         <section id="tab-content-dex" class="hidden space-y-6 sm:space-y-8" role="tabpanel" aria-labelledby="tab-btn-dex">
-            <div class="bg-gradient-to-r from-slate-900 to-purple-950/40 p-4 sm:p-6 rounded-2xl border border-purple-500/10">
-                <h2 class="text-lg sm:text-xl font-bold text-white mb-2">🗃️ Pokédex Registry</h2>
-                <p class="text-xs sm:text-sm text-slate-400">Track all Pokémon across your campaigns.</p>
+            <div class="bg-gradient-to-r from-slate-900 to-purple-950/40 p-4 sm:p-6 rounded-2xl border border-purple-500/10 shadow-xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div class="min-w-0">
+                    <h2 class="text-lg sm:text-xl font-bold mb-1 sm:mb-2 text-white flex items-center gap-2">
+                        <span>🗃️</span> <span>Master Living Dex Registry</span>
+                    </h2>
+                    <p class="text-xs sm:text-sm text-slate-400 leading-relaxed">
+                        Track specialized variations, forms, shinies, and regional assets down across your legacy hardware environments.
+                    </p>
+                </div>
+                <button id="btn-create-pokemon" class="shrink-0 bg-purple-600 hover:bg-purple-500 active:bg-purple-700 text-white font-bold text-xs px-4 sm:px-5 py-2.5 sm:py-3 rounded-xl transition duration-200 shadow-md shadow-purple-600/20 w-full sm:w-auto">
+                    ➕ Track Pokémon
+                </button>
             </div>
-            <div id="dex-content" class="bg-slate-900/40 border border-slate-800/80 p-4 sm:p-6 rounded-2xl text-center text-slate-400">
-                <p class="text-sm">Pokédex features coming soon...</p>
+
+            <div id="create-pokemon-panel" class="hidden bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-6 space-y-4">
+                <div class="border-b border-slate-800 pb-3 flex items-center justify-between gap-2">
+                    <h3 class="text-sm font-bold text-white flex items-center gap-2">🧬 Blueprint New Target</h3>
+                    <span class="text-[10px] text-purple-400 font-semibold uppercase tracking-wider hidden sm:inline">Data Injector</span>
+                </div>
+                <form id="new-pokemon-form" class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div class="space-y-1.5">
+                        <label for="new-p-name" class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Species Name</label>
+                        <input type="text" id="new-p-name" required placeholder="e.g., Celebi" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-purple-500 transition">
+                    </div>
+                    <div class="space-y-1.5">
+                        <label for="new-p-dexNo" class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">National Dex #</label>
+                        <input type="number" id="new-p-dexNo" required placeholder="e.g., 251" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-purple-500 transition">
+                    </div>
+                    <div class="space-y-1.5">
+                        <label for="new-p-game" class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Targeted Pipeline Game</label>
+                        <select id="new-p-game" required class="w-full px-3 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-purple-500 transition">
+                            <option value="">Select Game...</option>
+                            <option value="Crystal">🧅 Crystal</option>
+                            <option value="Emerald">🧪 Emerald</option>
+                            <option value="Platinum">💫 Platinum</option>
+                            <option value="HeartGold">🥎 HeartGold</option>
+                            <option value="Black 2">🐉 Black 2</option>
+                            <option value="Yellow">🐱 Yellow</option>
+                            <option value="Ultra Moon">🌀 Ultra Moon</option>
+                        </select>
+                    </div>
+                    <div class="space-y-1.5">
+                        <label for="new-p-form" class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Form / Alternate Variant</label>
+                        <input type="text" id="new-p-form" placeholder="e.g., Normal, Alolan, Unown-F" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-purple-500 transition">
+                    </div>
+                    <div class="space-y-1.5 flex flex-col justify-end">
+                        <label class="flex items-center gap-2 cursor-pointer p-2.5 bg-slate-950 border border-slate-800 rounded-xl hover:bg-slate-900 transition h-[38px]">
+                            <input type="checkbox" id="new-p-shiny" class="w-4 h-4 rounded cursor-pointer accent-purple-500">
+                            <span class="text-xs font-bold text-slate-300">✨ Shiny Mutation</span>
+                        </label>
+                    </div>
+                    <div class="flex justify-end gap-3 pt-2 sm:col-span-3 border-t border-slate-800/60">
+                        <button type="button" id="btn-cancel-pokemon" class="px-4 py-2.5 bg-slate-950 hover:bg-slate-900 border border-slate-800 rounded-xl text-xs font-semibold text-slate-300 transition">
+                            Cancel
+                        </button>
+                        <button type="submit" class="px-5 py-2.5 bg-purple-600 hover:bg-purple-500 active:bg-purple-700 rounded-xl text-xs font-bold text-white transition shadow-lg shadow-purple-600/20">
+                            Track Specimen
+                        </button>
+                    </div>
+                </form>
             </div>
+
+            <div id="pokemon-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                </div>
         </section>
 
-        <!-- SETTINGS TAB -->
         <section id="tab-content-settings" class="hidden space-y-6 sm:space-y-8" role="tabpanel" aria-labelledby="tab-btn-settings">
             <div class="bg-gradient-to-r from-slate-900 to-amber-950/40 p-4 sm:p-6 rounded-2xl border border-amber-500/10">
                 <h2 class="text-lg sm:text-xl font-bold text-white mb-2">⚙️ Settings</h2>
@@ -230,7 +270,6 @@
             </div>
             
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-                <!-- Data Management -->
                 <div class="bg-slate-900/40 border border-slate-800/80 p-4 sm:p-6 rounded-2xl">
                     <h3 class="text-sm font-bold text-white mb-4">💾 Data Management</h3>
                     <div class="space-y-2">
@@ -246,7 +285,6 @@
                     </div>
                 </div>
 
-                <!-- App Info -->
                 <div class="bg-slate-900/40 border border-slate-800/80 p-4 sm:p-6 rounded-2xl">
                     <h3 class="text-sm font-bold text-white mb-4">ℹ️ App Information</h3>
                     <div class="space-y-2 text-xs text-slate-400">
@@ -260,7 +298,6 @@
 
     </main>
 
-    <!-- Offline Indicator -->
     <div id="offline-banner" class="hidden fixed bottom-0 left-0 right-0 bg-amber-900/90 border-t border-amber-700 p-3 text-center text-xs text-amber-100 z-30">
         📡 You're offline. Changes are saved locally and will sync when online.
     </div>
@@ -271,7 +308,6 @@
         </div>
     </noscript>
 
-    <!-- Register Service Worker -->
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
@@ -282,7 +318,51 @@
         }
     </script>
 
-    <!-- Main Application -->
+    <script>
+        // Inline layout binders to prevent cross-file script execution desync
+        document.addEventListener('DOMContentLoaded', () => {
+            const pokeCreateBtn = document.getElementById('btn-create-pokemon');
+            const pokeCancelBtn = document.getElementById('btn-cancel-pokemon');
+            const pokePanel = document.getElementById('create-pokemon-panel');
+            const pokeForm = document.getElementById('new-pokemon-form');
+
+            if (pokeCreateBtn && pokePanel) {
+                pokeCreateBtn.addEventListener('click', () => {
+                    pokePanel.classList.toggle('hidden');
+                });
+            }
+
+            if (pokeCancelBtn && pokePanel && pokeForm) {
+                pokeCancelBtn.addEventListener('click', () => {
+                    pokePanel.classList.add('hidden');
+                    pokeForm.reset();
+                });
+            }
+
+            if (pokeForm && pokePanel) {
+                pokeForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    
+                    // Check if the foundational script interface is compiled ready
+                    if (typeof PokemonTracking !== 'undefined' && typeof UI !== 'undefined') {
+                        PokemonTracking.add({
+                            name: document.getElementById('new-p-name').value,
+                            dexNo: document.getElementById('new-p-dexNo').value,
+                            game: document.getElementById('new-p-game').value,
+                            form: document.getElementById('new-p-form').value,
+                            isShiny: document.getElementById('new-p-shiny').checked
+                        });
+
+                        pokePanel.classList.add('hidden');
+                        pokeForm.reset();
+                        UI.renderPokemonList();
+                    } else {
+                        console.error("❌ PokemonTracking management core is absent from engine scope.");
+                    }
+                });
+            }
+        });
+    </script>
     <script src="app.js"></script>
 </body>
 </html>
