@@ -13,6 +13,10 @@
     <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect fill='%230b0f19' width='180' height='180'/><text x='50%' y='50%' font-size='80' text-anchor='middle' dominant-baseline='central' font-family='system-ui'>🌟</text></svg>">
     
     <title>PokeQuest Living Dex</title>
+    
+    <!-- RESTORED TAILWIND CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
     <link rel="stylesheet" href="styles.css">
     
     <style>
@@ -22,6 +26,30 @@
             font-weight: 400;
             font-display: swap;
             src: local('system-ui'), local('-apple-system'), local('Segoe UI'), local('Helvetica Neue'), sans-serif;
+        }
+        
+        /* Custom Scrollbar for sleek aesthetic */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+        /* Hide scrollbars for simple filter strips */
+        .scrollbar-none::-webkit-scrollbar {
+            display: none;
+        }
+        .scrollbar-none {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
         }
     </style>
 </head>
