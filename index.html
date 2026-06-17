@@ -14,9 +14,7 @@
     
     <title>PokeQuest Living Dex</title>
     
-    <!-- RESTORED TAILWIND CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
     <link rel="stylesheet" href="styles.css">
     
     <style>
@@ -27,34 +25,11 @@
             font-display: swap;
             src: local('system-ui'), local('-apple-system'), local('Segoe UI'), local('Helvetica Neue'), sans-serif;
         }
-        
-        /* Custom Scrollbar for sleek aesthetic */
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #0f172a;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #334155;
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #475569;
-        }
-        /* Hide scrollbars for simple filter strips */
-        .scrollbar-none::-webkit-scrollbar {
-            display: none;
-        }
-        .scrollbar-none {
-            -ms-overflow-style: none;  /* IE and Edge */
-            scrollbar-width: none;  /* Firefox */
-        }
     </style>
 </head>
 <body class="text-slate-100 bg-slate-950 min-h-screen flex flex-col selection:bg-indigo-500 selection:text-white">
 
+    <!-- Header & Navigation -->
     <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-40 transition-all">
         <div class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
             <div class="flex items-center gap-3 flex-1 min-w-0">
@@ -86,7 +61,8 @@
             </nav>
         </div>
 
-        <nav id="mobile-nav" class="hidden md:hidden border-t border-slate-800 bg-slate-900 p-3 space-y-2">
+        <!-- Mobile Menu Panel -->
+        <nav id="mobile-nav" class="hidden md:hidden border-t border-slate-800 bg-slate-900 p-3 space-y-2 shadow-xl absolute w-full">
             <button data-tab="missions" id="tab-btn-missions-mobile" class="w-full text-left px-4 py-2.5 text-sm font-semibold rounded-lg bg-indigo-600 text-white transition-all">🗺️ Missions</button>
             <button data-tab="dex" id="tab-btn-dex-mobile" class="w-full text-left px-4 py-2.5 text-sm font-semibold rounded-lg text-slate-400 hover:text-white bg-slate-950 transition-all">🗃️ Dex Registry</button>
             <button data-tab="settings" id="tab-btn-settings-mobile" class="w-full text-left px-4 py-2.5 text-sm font-semibold rounded-lg text-slate-400 hover:text-white bg-slate-950 transition-all">⚙️ Settings</button>
@@ -95,7 +71,7 @@
 
     <main class="flex-grow w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         
-        <!-- MISSIONS TAB -->
+        <!-- ================= MISSIONS TAB ================= -->
         <section id="tab-content-missions" class="space-y-6 sm:space-y-8" role="tabpanel">
             <div class="bg-gradient-to-r from-slate-900 to-indigo-950/40 p-4 sm:p-6 rounded-2xl border border-indigo-500/10 shadow-xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div class="min-w-0">
@@ -140,8 +116,8 @@
                     <h3 class="text-sm font-bold text-white flex items-center gap-2">⚔️ Forge Quest</h3>
                 </div>
                 <form id="new-mission-form" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <input type="text" id="new-m-title" required placeholder="Mission Title" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white">
-                    <select id="new-m-game" required class="w-full px-3 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white">
+                    <input type="text" id="new-m-title" required placeholder="Mission Title" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:border-indigo-500 transition">
+                    <select id="new-m-game" required class="w-full px-3 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:border-indigo-500 transition">
                         <option value="Emerald">🧪 Emerald</option>
                         <option value="Crystal">🧅 Crystal</option>
                         <option value="Platinum">💫 Platinum</option>
@@ -152,18 +128,18 @@
                         <option value="Legends: Z-A">🗼 Legends: Z-A</option>
                         <option value="Other">⚔️ Custom/Other</option>
                     </select>
-                    <input type="text" id="new-m-platform" required placeholder="Hardware (e.g., DS Lite)" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white">
-                    <input type="text" id="new-m-tag" required placeholder="Badge Label" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white">
-                    <select id="new-m-color" required class="w-full px-3 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white">
+                    <input type="text" id="new-m-platform" required placeholder="Hardware (e.g., DS Lite)" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:border-indigo-500 transition">
+                    <input type="text" id="new-m-tag" required placeholder="Badge Label" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:border-indigo-500 transition">
+                    <select id="new-m-color" required class="w-full px-3 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:border-indigo-500 transition">
                         <option value="indigo">💜 Indigo</option>
                         <option value="emerald">💚 Emerald</option>
                         <option value="cyan">💙 Cyan</option>
                         <option value="amber">💛 Amber</option>
                         <option value="rose">❤️ Rose</option>
                     </select>
-                    <input type="text" id="new-m-emoji" required placeholder="Emoji (e.g., 🎗️)" maxlength="2" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white">
-                    <textarea id="new-m-desc" required placeholder="Description..." class="w-full h-20 px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white sm:col-span-2 resize-none"></textarea>
-                    <textarea id="new-m-tasks" required placeholder="Task 1&#10;Task 2" class="w-full h-24 px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white sm:col-span-2 resize-none"></textarea>
+                    <input type="text" id="new-m-emoji" required placeholder="Emoji (e.g., 🎗️)" maxlength="2" class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:border-indigo-500 transition">
+                    <textarea id="new-m-desc" required placeholder="Description..." class="w-full h-20 px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white sm:col-span-2 resize-none focus:border-indigo-500 transition"></textarea>
+                    <textarea id="new-m-tasks" required placeholder="Task 1&#10;Task 2" class="w-full h-24 px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white sm:col-span-2 resize-none focus:border-indigo-500 transition font-mono"></textarea>
                     
                     <div class="sm:col-span-2 flex justify-end gap-3 pt-2">
                         <button type="button" id="btn-cancel-mission" class="px-4 py-2.5 bg-slate-950 hover:bg-slate-900 border border-slate-800 rounded-xl text-xs font-semibold text-slate-300 transition">Cancel</button>
@@ -172,6 +148,7 @@
                 </form>
             </div>
 
+            <!-- Horizontal Mission Filters -->
             <div class="border-t border-slate-800/60 pt-4 sm:pt-6">
                 <div class="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none" id="mission-filters">
                     <button class="mission-filter-btn px-3.5 py-1.5 bg-indigo-600 text-white rounded-lg text-xs font-bold whitespace-nowrap transition-all" data-filter="all">All Games</button>
@@ -187,15 +164,17 @@
             <div id="missions-grid" class="grid grid-cols-1 lg:grid-cols-2 gap-6"></div>
         </section>
 
-        <!-- DEX REGISTRY TAB (Fully Restored) -->
+        <!-- ================= DEX REGISTRY TAB ================= -->
         <section id="tab-content-dex" class="hidden space-y-6 sm:space-y-8" role="tabpanel">
+            
+            <!-- GraphQL Sync Banner -->
             <div id="sync-banner" class="bg-gradient-to-r from-slate-900 to-purple-950/40 p-4 sm:p-6 rounded-2xl border border-purple-500/10 shadow-xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div class="min-w-0">
                     <h2 class="text-lg sm:text-xl font-bold mb-1 sm:mb-2 text-white flex items-center gap-2">
-                        <span class="animate-pulse">⚡</span> Initialize Database
+                        <span class="animate-pulse">⚡</span> Database GraphQL Sync
                     </h2>
                     <p class="text-xs sm:text-sm text-slate-400 leading-relaxed">
-                        Fetch real-time nomenclature updates from PokeAPI. (Checkmarks are completely preserved).
+                        Fetch real-time nomenclature, types, and egg groups from PokeAPI via GraphQL in a single payload.
                     </p>
                 </div>
                 <button id="api-sync-btn" class="shrink-0 bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs px-4 sm:px-5 py-2.5 sm:py-3 rounded-xl transition duration-200 shadow-md shadow-purple-600/20">
@@ -203,9 +182,10 @@
                 </button>
             </div>
 
+            <!-- API Progress Indicator -->
             <div id="api-progress-wrapper" class="hidden bg-slate-900 border border-slate-800 p-5 rounded-xl space-y-3">
                 <div class="flex items-center justify-between text-xs font-semibold">
-                    <span id="api-progress-label" class="text-slate-300">Connecting...</span>
+                    <span id="api-progress-label" class="text-slate-300">Establishing GraphQL tunnel...</span>
                     <span id="api-progress-percent" class="text-indigo-400 font-mono">0%</span>
                 </div>
                 <div class="w-full bg-slate-950 h-2.5 rounded-full overflow-hidden border border-slate-800">
@@ -213,55 +193,123 @@
                 </div>
             </div>
 
-            <div class="bg-slate-900/60 border border-slate-800/80 p-5 rounded-2xl space-y-4">
-                <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
-                    <div class="md:col-span-5 relative">
+            <!-- Comprehensive Data Filter Engine -->
+            <div class="bg-slate-900/60 border border-slate-800/80 p-4 sm:p-5 rounded-2xl space-y-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    
+                    <!-- Search Input -->
+                    <div class="sm:col-span-2 lg:col-span-4 relative">
                         <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-500 pointer-events-none text-xs">🔍</span>
-                        <input type="text" id="dex-search" placeholder="Search by name or number..." class="w-full pl-9 pr-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-indigo-500 transition">
+                        <input type="text" id="dex-search" placeholder="Search by species name or national number..." class="w-full pl-9 pr-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-indigo-500 transition">
                     </div>
-                    <div class="md:col-span-4">
-                        <select id="dex-gen-filter" class="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-indigo-500 transition">
-                            <option value="all">🌍 All Generations</option>
-                            <option value="1">Gen 1: Kanto</option>
-                            <option value="2">Gen 2: Johto</option>
-                            <option value="3">Gen 3: Hoenn</option>
-                            <option value="4">Gen 4: Sinnoh</option>
-                            <option value="5">Gen 5: Unova</option>
-                            <option value="6">Gen 6: Kalos</option>
-                            <option value="7">Gen 7: Alola</option>
-                            <option value="8">Gen 8: Galar</option>
-                            <option value="9">Gen 9: Paldea</option>
-                        </select>
-                    </div>
-                    <div class="md:col-span-3">
-                        <select id="dex-state-filter" class="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-indigo-500 transition">
-                            <option value="all">🌟 All Targets</option>
-                            <option value="missing">❌ Missing Only</option>
-                            <option value="caught">✅ Caught Only</option>
-                            <option value="shiny">✨ Shinies Only</option>
-                        </select>
-                    </div>
+                    
+                    <!-- Filter: Generation -->
+                    <select id="dex-gen-filter" class="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-indigo-500 transition cursor-pointer">
+                        <option value="all">🌍 All Generations</option>
+                        <option value="1">Gen 1: Kanto (1-151)</option>
+                        <option value="2">Gen 2: Johto (152-251)</option>
+                        <option value="3">Gen 3: Hoenn (252-386)</option>
+                        <option value="4">Gen 4: Sinnoh (387-493)</option>
+                        <option value="5">Gen 5: Unova (494-649)</option>
+                        <option value="6">Gen 6: Kalos (650-721)</option>
+                        <option value="7">Gen 7: Alola (722-809)</option>
+                        <option value="8">Gen 8: Galar (810-905)</option>
+                        <option value="9">Gen 9: Paldea (906-1025)</option>
+                    </select>
+
+                    <!-- Filter: Typing -->
+                    <select id="dex-type-filter" class="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-indigo-500 transition cursor-pointer">
+                        <option value="all">🔮 All Types</option>
+                        <option value="normal">Normal</option>
+                        <option value="fire">Fire</option>
+                        <option value="water">Water</option>
+                        <option value="grass">Grass</option>
+                        <option value="electric">Electric</option>
+                        <option value="ice">Ice</option>
+                        <option value="fighting">Fighting</option>
+                        <option value="poison">Poison</option>
+                        <option value="ground">Ground</option>
+                        <option value="flying">Flying</option>
+                        <option value="psychic">Psychic</option>
+                        <option value="bug">Bug</option>
+                        <option value="rock">Rock</option>
+                        <option value="ghost">Ghost</option>
+                        <option value="dragon">Dragon</option>
+                        <option value="dark">Dark</option>
+                        <option value="steel">Steel</option>
+                        <option value="fairy">Fairy</option>
+                    </select>
+
+                    <!-- Filter: Egg Groups -->
+                    <select id="dex-egg-filter" class="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-indigo-500 transition cursor-pointer">
+                        <option value="all">🥚 All Egg Groups</option>
+                        <option value="monster">Monster</option>
+                        <option value="water1">Water 1</option>
+                        <option value="bug">Bug</option>
+                        <option value="flying">Flying</option>
+                        <option value="ground">Field</option>
+                        <option value="fairy">Fairy</option>
+                        <option value="plant">Grass</option>
+                        <option value="humanshape">Human-Like</option>
+                        <option value="water3">Water 3</option>
+                        <option value="mineral">Mineral</option>
+                        <option value="indeterminate">Amorphous</option>
+                        <option value="water2">Water 2</option>
+                        <option value="ditto">Ditto</option>
+                        <option value="dragon">Dragon</option>
+                        <option value="no-eggs">No Eggs Discovered</option>
+                    </select>
+
+                    <!-- Filter: Collection Status -->
+                    <select id="dex-state-filter" class="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-indigo-500 transition cursor-pointer">
+                        <option value="all">🌟 All Registry Targets</option>
+                        <option value="missing">❌ Missing Only</option>
+                        <option value="caught">✅ Caught Only</option>
+                        <option value="shiny">✨ Shinies Only</option>
+                    </select>
                 </div>
 
+                <!-- Stats summary strip -->
                 <div class="flex flex-wrap items-center justify-between text-xs text-slate-400 gap-4 pt-2 border-t border-slate-800/60">
-                    <div>Total Registered: <strong id="stat-total-pokemon" class="text-white font-mono">0</strong></div>
+                    <div>Total Query Matches: <strong id="stat-total-pokemon" class="text-white font-mono">0</strong></div>
                     <div>Base Caught: <strong id="stat-base-caught" class="text-emerald-400 font-mono">0</strong></div>
-                    <div>Forms Captured: <strong id="stat-total-forms" class="text-purple-400 font-mono">0</strong></div>
+                    <div>Alt Forms: <strong id="stat-total-forms" class="text-purple-400 font-mono">0</strong></div>
                 </div>
             </div>
 
-            <div id="dex-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+            <!-- Top Pagination Bar -->
+            <div class="flex flex-col sm:flex-row items-center justify-between p-4 bg-slate-900/40 border border-slate-800 rounded-2xl gap-4">
+                <div class="flex items-center gap-3">
+                    <span id="pagination-info" class="text-xs font-semibold text-indigo-300">Showing 0 of 0 entries</span>
+                    <select id="dex-limit" class="bg-slate-950 border border-slate-700 rounded-lg px-2 py-1.5 text-xs text-slate-300 focus:outline-none focus:border-indigo-500 cursor-pointer">
+                        <option value="24">24 per page</option>
+                        <option value="48" selected>48 per page</option>
+                        <option value="96">96 per page</option>
+                        <option value="all">View All (Lag Warning)</option>
+                    </select>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <button id="btn-prev-page" class="px-4 py-2 bg-slate-950 border border-slate-800 hover:border-slate-700 text-xs text-slate-300 font-semibold rounded-lg disabled:opacity-40 transition">◀ Prev</button>
+                    <select id="dex-page-jump" class="bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs font-semibold text-slate-300 focus:outline-none focus:border-indigo-500 cursor-pointer">
+                        <!-- Populated Dynamically -->
+                    </select>
+                    <button id="btn-next-page" class="px-4 py-2 bg-slate-950 border border-slate-800 hover:border-slate-700 text-xs text-slate-300 font-semibold rounded-lg disabled:opacity-40 transition">Next ▶</button>
+                </div>
+            </div>
 
-            <div class="flex items-center justify-between p-4 bg-slate-900/40 border border-slate-800 rounded-2xl">
-                <span id="pagination-info" class="text-xs text-slate-400">Showing 0 of 0 entries</span>
-                <div class="flex space-x-2">
-                    <button id="btn-prev-page" class="px-4 py-2 bg-slate-950 border border-slate-800 hover:border-slate-700 text-xs text-slate-300 font-semibold rounded-lg disabled:opacity-50 disabled:cursor-not-allowed">◀ Prev</button>
-                    <button id="btn-next-page" class="px-4 py-2 bg-slate-950 border border-slate-800 hover:border-slate-700 text-xs text-slate-300 font-semibold rounded-lg disabled:opacity-50 disabled:cursor-not-allowed">Next ▶</button>
+            <!-- Dex Grid Injection Target -->
+            <div id="dex-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"></div>
+
+            <!-- Bottom Pagination Bar -->
+            <div class="flex justify-center p-4">
+                <div class="flex items-center space-x-2">
+                    <button id="btn-prev-page-btm" class="px-5 py-2.5 bg-slate-950 border border-slate-800 hover:border-slate-700 text-xs text-slate-300 font-semibold rounded-xl disabled:opacity-40 transition shadow-lg">◀ Previous Page</button>
+                    <button id="btn-next-page-btm" class="px-5 py-2.5 bg-indigo-600 border border-indigo-500 hover:bg-indigo-500 text-xs text-white font-semibold rounded-xl disabled:opacity-40 transition shadow-lg shadow-indigo-600/20">Next Page ▶</button>
                 </div>
             </div>
         </section>
 
-        <!-- SETTINGS / SYNC TAB -->
+        <!-- ================= SETTINGS TAB ================= -->
         <section id="tab-content-settings" class="hidden space-y-6 sm:space-y-8" role="tabpanel">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-6 space-y-4">
@@ -284,11 +332,22 @@
         </section>
     </main>
 
-    <div id="toast-wrapper" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none max-w-sm w-full"></div>
+    <!-- Slide-in Toast Notifications -->
+    <div id="toast-wrapper" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none max-w-sm w-full" role="region" aria-live="polite"></div>
 
+    <!-- Footer -->
+    <footer class="text-center py-8 text-[10px] text-slate-600 border-t border-slate-900 bg-slate-950/40 mt-auto">
+        <p>PokeQuest Master Living Dex Dashboard • Hardware Companion Engine</p>
+    </footer>
+
+    <!-- Service Worker Initializer -->
     <script>
         if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => navigator.serviceWorker.register('sw.js'));
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(reg => console.log('✅ Service Worker registered'))
+                    .catch(err => console.log('❌ Service Worker registration failed:', err));
+            });
         }
     </script>
     <script src="app.js"></script>
