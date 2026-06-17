@@ -1,6 +1,7 @@
 /**
  * PokeQuest - Main Application Logic
- * Master Build: Mobile Nav Fixed, Mission Auto-Sync, PokeAPI, and Shiny Locks.
+ * No external data.js required. Generates full 1025 Dex automatically.
+ * Includes PokeAPI Sprites, Shiny Lock validations, and all 10 Master Missions.
  */
 
 const STORAGE_KEY = 'poke_quest_data_v2';
@@ -103,7 +104,7 @@ function triggerToast(message, type = 'indigo') {
     const wrapper = document.getElementById('toast-wrapper');
     if (!wrapper) return;
     const t = document.createElement('div');
-    t.className = `p-4 rounded-xl shadow-xl border text-xs font-semibold backdrop-blur transition-all duration-300 transform translate-y-2 opacity-0 bg-slate-900 border-${type}-500/30 text-${type}-400 flex items-center gap-2`;
+    t.className = `p-4 rounded-xl shadow-xl border text-xs font-semibold backdrop-blur transition-all duration-300 translate-y-2 opacity-0 bg-slate-900 border-${type}-500/30 text-${type}-400 flex items-center gap-2`;
     t.innerHTML = `<span>✨</span> <span>${escapeHTML(message)}</span>`;
     wrapper.appendChild(t);
     setTimeout(() => t.classList.remove('translate-y-2', 'opacity-0'), 50);
@@ -146,41 +147,14 @@ const Storage = {
             try {
                 const parsed = JSON.parse(raw);
                 state.pokemon = parsed.pokemon || generateNationalDex();
-                
-                // MIGRATION: Sanitize Copilot's broken arrays and Sync Missing Default Missions
-                let rawMissions = parsed.missions || [];
-                
-                // Fix broken string tasks
-                rawMissions = rawMissions.map(m => {
-                    if (m.tasks && m.tasks.length > 0 && typeof m.tasks[0] === 'string') {
-                        const completed = m.completedTasks || [];
-                        m.tasks = m.tasks.map((taskStr, i) => ({
-                            id: `t_${i}_${Date.now()}`,
-                            text: taskStr,
-                            checked: completed.includes(i)
-                        }));
-                    }
-                    if (!m.color) m.color = "indigo";
-                    return m;
-                });
-
-                // Actively check for and append any default missions that are missing from the save file
-                const existingMissionIds = new Set(rawMissions.map(m => m.id));
-                DEFAULT_MISSIONS.forEach(dm => {
-                    if (!existingMissionIds.has(dm.id)) {
-                        rawMissions.push(dm);
-                    }
-                });
-
-                state.missions = rawMissions;
-
+                state.missions = parsed.missions || DEFAULT_MISSIONS;
             } catch(e) {
                 state.pokemon = generateNationalDex();
-                state.missions = [...DEFAULT_MISSIONS];
+                state.missions = DEFAULT_MISSIONS;
             }
         } else {
             state.pokemon = generateNationalDex();
-            state.missions = [...DEFAULT_MISSIONS];
+            state.missions = DEFAULT_MISSIONS;
             this.save();
         }
         this.updateSize();
@@ -213,13 +187,13 @@ const UI = {
         }
 
         grid.innerHTML = filtered.map(m => {
-            const total = m.tasks ? m.tasks.length : 0;
-            const completed = m.tasks ? m.tasks.filter(t => t.checked).length : 0;
+            const total = m.tasks.length;
+            const completed = m.tasks.filter(t => t.checked).length;
             const pct = total > 0 ? Math.round((completed/total)*100) : 0;
             return `
                 <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-5 relative">
                     <button data-delete-mission="${m.id}" class="absolute top-4 right-4 text-slate-500 hover:text-rose-400">🗑️</button>
-                    <div class="flex items-start gap-3 pr-6">
+                    <div class="flex items-start gap-3">
                         <span class="text-2xl">${m.emoji}</span>
                         <div>
                             <h4 class="text-sm font-bold text-white">${escapeHTML(m.title)}</h4>
@@ -228,16 +202,16 @@ const UI = {
                     </div>
                     <p class="text-xs text-slate-400 mt-3">${escapeHTML(m.desc)}</p>
                     <div class="mt-4 space-y-2 border-t border-slate-800 pt-4">
-                        ${(m.tasks || []).map(t => `
-                            <label class="flex items-start gap-2 cursor-pointer text-xs text-slate-300 hover:bg-slate-800/30 p-1 rounded transition select-none">
-                                <input type="checkbox" data-mission="${m.id}" data-task="${t.id}" ${t.checked ? 'checked' : ''} class="mission-checkbox mt-0.5 w-3.5 h-3.5 bg-slate-900 border-slate-700 rounded text-indigo-500 cursor-pointer shrink-0">
+                        ${m.tasks.map(t => `
+                            <label class="flex items-center gap-2 cursor-pointer text-xs text-slate-300">
+                                <input type="checkbox" data-mission="${m.id}" data-task="${t.id}" ${t.checked ? 'checked' : ''} class="mission-checkbox w-4 h-4 bg-slate-900 border-slate-700 rounded text-indigo-500 cursor-pointer">
                                 <span class="${t.checked ? 'line-through text-slate-500' : ''}">${escapeHTML(t.text)}</span>
                             </label>
                         `).join('')}
                     </div>
                     <div class="mt-4 flex items-center justify-between text-[10px] text-slate-500">
                         <div class="w-full bg-slate-950 h-1.5 rounded-full overflow-hidden mr-3">
-                            <div class="bg-indigo-500 h-full transition-all" style="width: ${pct}%"></div>
+                            <div class="bg-indigo-500 h-full" style="width: ${pct}%"></div>
                         </div>
                         <span>${pct}%</span>
                     </div>
@@ -253,7 +227,6 @@ const UI = {
         DEFAULT_GAME_ORDER.forEach(g => gStats[g] = { t:0, c:0 });
 
         state.missions.forEach(m => {
-            if (!m.tasks) return;
             m.tasks.forEach(t => {
                 total++; if(t.checked) checked++;
                 const k = gStats[m.game] ? m.game : 'Other';
@@ -274,10 +247,10 @@ const UI = {
             return `
                 <div class="bg-slate-950 border border-slate-900 rounded-xl p-2.5">
                     <div class="flex justify-between text-[10px] font-bold text-slate-400 mb-1">
-                        <span class="truncate pr-1">${g}</span><span class="text-white">${p}%</span>
+                        <span>${g}</span><span class="text-white">${p}%</span>
                     </div>
                     <div class="w-full bg-slate-900 h-1.5 rounded-full overflow-hidden">
-                        <div class="bg-indigo-500 h-full transition-all" style="width: ${p}%"></div>
+                        <div class="bg-indigo-500 h-full" style="width: ${p}%"></div>
                     </div>
                 </div>`;
         }).join('');
@@ -319,11 +292,6 @@ const UI = {
         if(statBase) statBase.innerText = state.pokemon.filter(p => p.caughtNormal || p.caughtShiny).length;
         if(statForms) statForms.innerText = state.pokemon.reduce((acc, curr) => acc + (curr.caughtForms?.length || 0), 0);
 
-        if (slice.length === 0) {
-            grid.innerHTML = `<div class="col-span-full border border-dashed border-slate-800 p-16 text-center rounded-2xl text-xs text-slate-500">No species match parameters.</div>`;
-            return;
-        }
-
         grid.innerHTML = slice.map(p => {
             const spriteUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${p.num}.png`;
             const isShinyLocked = SHINY_LOCKED_IDS.includes(p.num);
@@ -342,38 +310,38 @@ const UI = {
                     </div>
 
                     <div class="grid grid-cols-2 gap-2 bg-slate-950/40 p-2 rounded-xl border border-slate-800/40">
-                        <label class="flex items-center text-[11px] font-medium text-slate-300 cursor-pointer select-none">
+                        <label class="flex items-center text-[11px] font-medium text-slate-300 cursor-pointer">
                             <input type="checkbox" data-dex="${p.num}" data-field="caughtNormal" ${p.caughtNormal ? 'checked' : ''} class="dex-cb w-3.5 h-3.5 rounded bg-slate-900 border-slate-700 text-indigo-500 cursor-pointer">
                             <span class="ml-2">Normal</span>
                         </label>
                         ${isShinyLocked ? `
-                        <div class="flex items-center text-[11px] font-medium text-slate-500 cursor-not-allowed select-none" title="Shiny Locked by Game Freak">
+                        <div class="flex items-center text-[11px] font-medium text-slate-500 cursor-not-allowed" title="Shiny Locked by Game Freak">
                             <span class="w-3.5 h-3.5 flex items-center justify-center text-[10px]">🔒</span>
                             <span class="ml-2">Shiny Locked</span>
                         </div>
                         ` : `
-                        <label class="flex items-center text-[11px] font-medium text-amber-400 cursor-pointer select-none">
+                        <label class="flex items-center text-[11px] font-medium text-amber-400 cursor-pointer">
                             <input type="checkbox" data-dex="${p.num}" data-field="caughtShiny" ${p.caughtShiny ? 'checked' : ''} class="dex-cb w-3.5 h-3.5 rounded bg-slate-900 border-slate-700 text-amber-500 cursor-pointer">
-                            <span class="ml-2 flex items-center gap-0.5">✨ Shiny</span>
+                            <span class="ml-2">✨ Shiny</span>
                         </label>
                         `}
                     </div>
 
                     ${p.hasRegional ? `
                     <div class="grid grid-cols-2 gap-2 bg-indigo-950/10 p-2 rounded-xl border border-indigo-500/10 mt-2">
-                        <label class="flex items-center text-[11px] font-medium text-slate-300 cursor-pointer select-none">
+                        <label class="flex items-center text-[11px] font-medium text-slate-300 cursor-pointer">
                             <input type="checkbox" data-dex="${p.num}" data-field="caughtRegionalNormal" ${p.caughtRegionalNormal ? 'checked' : ''} class="dex-cb w-3.5 h-3.5 rounded bg-slate-900 border-slate-700 text-indigo-500 cursor-pointer">
                             <span class="ml-2">Reg Normal</span>
                         </label>
                         ${isShinyLocked ? `
-                        <div class="flex items-center text-[11px] font-medium text-slate-500 cursor-not-allowed select-none" title="Shiny Locked by Game Freak">
+                        <div class="flex items-center text-[11px] font-medium text-slate-500 cursor-not-allowed" title="Shiny Locked by Game Freak">
                             <span class="w-3.5 h-3.5 flex items-center justify-center text-[10px]">🔒</span>
                             <span class="ml-2">Reg Locked</span>
                         </div>
                         ` : `
-                        <label class="flex items-center text-[11px] font-medium text-amber-400 cursor-pointer select-none">
+                        <label class="flex items-center text-[11px] font-medium text-amber-400 cursor-pointer">
                             <input type="checkbox" data-dex="${p.num}" data-field="caughtRegionalShiny" ${p.caughtRegionalShiny ? 'checked' : ''} class="dex-cb w-3.5 h-3.5 rounded bg-slate-900 border-slate-700 text-amber-500 cursor-pointer">
-                            <span class="ml-2 flex items-center gap-0.5">✨ Reg Shiny</span>
+                            <span class="ml-2">✨ Reg Shiny</span>
                         </label>
                         `}
                     </div>
@@ -386,9 +354,9 @@ const UI = {
                         </button>
                         <div id="form-${p.num}" class="hidden mt-2 grid grid-cols-2 gap-1 max-h-32 overflow-y-auto">
                             ${p.formsList.map(f => `
-                                <label class="flex items-center text-[10px] text-slate-300 cursor-pointer truncate select-none bg-slate-950 p-1 rounded border border-slate-800">
-                                    <input type="checkbox" data-dex="${p.num}" data-form="${escapeHTML(f)}" ${p.caughtForms?.includes(f) ? 'checked' : ''} class="form-cb w-3 h-3 mr-1.5 bg-slate-900 border-slate-700 rounded text-purple-500 shrink-0">
-                                    <span class="truncate">${escapeHTML(f)}</span>
+                                <label class="flex items-center text-[10px] text-slate-300 cursor-pointer truncate">
+                                    <input type="checkbox" data-dex="${p.num}" data-form="${escapeHTML(f)}" ${p.caughtForms?.includes(f) ? 'checked' : ''} class="form-cb w-3 h-3 mr-1 bg-slate-900 border-slate-700 rounded text-purple-500">
+                                    ${escapeHTML(f)}
                                 </label>
                             `).join('')}
                         </div>
@@ -402,74 +370,34 @@ const UI = {
 
 // ==================== EVENTS & INIT ====================
 document.addEventListener('DOMContentLoaded', () => {
-    
-    // --- 1. CORE BINDINGS (Mobile Nav & Tabs bound BEFORE data load) ---
-    
-    // THE HAMBURGER FIX
-    const navToggle = document.getElementById('nav-toggle');
-    const mobileNav = document.getElementById('mobile-nav');
-    if (navToggle && mobileNav) {
-        navToggle.addEventListener('click', (e) => {
-            e.preventDefault();
-            mobileNav.classList.toggle('hidden');
-        });
-    }
+    Storage.load();
+    UI.renderMissions();
+    UI.renderDex();
 
-    // TABS (Desktop and Mobile)
+    // TABS
     document.querySelectorAll('[data-tab]').forEach(btn => {
         btn.addEventListener('click', () => {
             state.currentTab = btn.dataset.tab;
-            
-            // Hide all panels
             document.querySelectorAll('[role="tabpanel"]').forEach(p => p.classList.add('hidden'));
-            
-            // Show target panel
             const targetContent = document.getElementById(`tab-content-${state.currentTab}`);
             if (targetContent) targetContent.classList.remove('hidden');
             
-            // Update Desktop buttons
-            document.querySelectorAll('#nav-menu button').forEach(b => {
-                b.classList.remove('bg-indigo-600', 'text-white', 'shadow-md', 'shadow-indigo-600/20');
-                b.classList.add('text-slate-400', 'hover:text-white', 'bg-slate-950');
-            });
-            const desktopBtn = document.getElementById(`tab-btn-${state.currentTab}`);
-            if (desktopBtn) {
-                desktopBtn.classList.add('bg-indigo-600', 'text-white', 'shadow-md', 'shadow-indigo-600/20');
-                desktopBtn.classList.remove('text-slate-400', 'hover:text-white', 'bg-slate-950');
-            }
-            
-            // Update Mobile buttons
-            document.querySelectorAll('#mobile-nav button').forEach(b => {
+            document.querySelectorAll('nav button').forEach(b => {
                 b.classList.remove('bg-indigo-600', 'text-white');
-                b.classList.add('text-slate-400', 'bg-slate-950');
+                b.classList.add('text-slate-400');
             });
-            const mobileBtn = document.getElementById(`tab-btn-${state.currentTab}-mobile`);
-            if (mobileBtn) {
-                mobileBtn.classList.add('bg-indigo-600', 'text-white');
-                mobileBtn.classList.remove('text-slate-400', 'bg-slate-950');
-            }
+            btn.classList.add('bg-indigo-600', 'text-white');
+            btn.classList.remove('text-slate-400');
             
-            // Render specific view
             if (state.currentTab === 'missions') UI.renderMissions();
             if (state.currentTab === 'dex') UI.renderDex();
             
-            // Automatically close the mobile menu on tap
+            const mobileNav = document.getElementById('mobile-nav');
             if (mobileNav) mobileNav.classList.add('hidden');
         });
     });
 
-    // --- 2. DATA LOAD & RENDER ---
-    try {
-        Storage.load();
-        UI.renderMissions();
-        if (state.currentTab === 'dex') UI.renderDex(); 
-    } catch(e) {
-        console.error("Initialization Error:", e);
-    }
-
-    // --- 3. ATTACH FUNCTIONAL EVENT LISTENERS ---
-    
-    // Missions UI
+    // MISSIONS
     const createBtn = document.getElementById('btn-create-mission');
     const cancelBtn = document.getElementById('btn-cancel-mission');
     const missionForm = document.getElementById('new-mission-form');
@@ -489,7 +417,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 emoji: document.getElementById('new-m-emoji').value,
                 desc: document.getElementById('new-m-desc').value,
                 color: document.getElementById('new-m-color').value,
-                tasks: document.getElementById('new-m-tasks').value.split('\n').filter(t=>t.trim()).map((t, i) => ({ id: `t_${i}_${Date.now()}`, text: t, checked: false }))
+                tasks: document.getElementById('new-m-tasks').value.split('\n').filter(t=>t.trim()).map((t, i) => ({ id: `t_${i}`, text: t, checked: false }))
             });
             Storage.save();
             UI.renderMissions();
@@ -513,10 +441,8 @@ document.addEventListener('DOMContentLoaded', () => {
         missionsGrid.addEventListener('change', (e) => {
             if (e.target.classList.contains('mission-checkbox')) {
                 const m = state.missions.find(ms => ms.id === e.target.dataset.mission);
-                if (m && m.tasks) {
-                    const t = m.tasks.find(ts => ts.id === e.target.dataset.task);
-                    if (t) t.checked = e.target.checked;
-                }
+                const t = m.tasks.find(ts => ts.id === e.target.dataset.task);
+                t.checked = e.target.checked;
                 Storage.save();
                 UI.renderMissions();
             }
@@ -524,17 +450,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
         missionsGrid.addEventListener('click', (e) => {
             if (e.target.dataset.deleteMission) {
-                if(confirm("Are you sure you want to delete this mission?")) {
-                    state.missions = state.missions.filter(m => m.id !== e.target.dataset.deleteMission);
-                    Storage.save();
-                    UI.renderMissions();
-                    triggerToast('Mission deleted.', 'rose');
-                }
+                state.missions = state.missions.filter(m => m.id !== e.target.dataset.deleteMission);
+                Storage.save();
+                UI.renderMissions();
+                triggerToast('Mission deleted.', 'rose');
             }
         });
     }
 
-    // Dex UI
+    // DEX
     const dexSearch = document.getElementById('dex-search');
     const dexGenFilter = document.getElementById('dex-gen-filter');
     const dexStateFilter = document.getElementById('dex-state-filter');
@@ -545,31 +469,29 @@ document.addEventListener('DOMContentLoaded', () => {
     if (dexSearch) dexSearch.addEventListener('input', debounce(e => { state.dexSearch = e.target.value; state.currentPage = 1; UI.renderDex(); }, 250));
     if (dexGenFilter) dexGenFilter.addEventListener('change', e => { state.dexGen = e.target.value; state.currentPage = 1; UI.renderDex(); });
     if (dexStateFilter) dexStateFilter.addEventListener('change', e => { state.dexState = e.target.value; state.currentPage = 1; UI.renderDex(); });
-    if (btnPrev) btnPrev.addEventListener('click', () => { state.currentPage--; UI.renderDex(); window.scrollTo({ top: 0, behavior: 'smooth' }); });
-    if (btnNext) btnNext.addEventListener('click', () => { state.currentPage++; UI.renderDex(); window.scrollTo({ top: 0, behavior: 'smooth' }); });
+    if (btnPrev) btnPrev.addEventListener('click', () => { state.currentPage--; UI.renderDex(); });
+    if (btnNext) btnNext.addEventListener('click', () => { state.currentPage++; UI.renderDex(); });
 
     if (dexGrid) {
         dexGrid.addEventListener('change', (e) => {
             if (e.target.classList.contains('dex-cb')) {
                 const p = state.pokemon.find(x => x.num === parseInt(e.target.dataset.dex));
-                if (p) p[e.target.dataset.field] = e.target.checked;
+                p[e.target.dataset.field] = e.target.checked;
                 Storage.save();
-                UI.renderDex(); 
+                UI.renderDex(); // Update stats
             }
             if (e.target.classList.contains('form-cb')) {
                 const p = state.pokemon.find(x => x.num === parseInt(e.target.dataset.dex));
-                if (p) {
-                    if (!p.caughtForms) p.caughtForms = [];
-                    if (e.target.checked) p.caughtForms.push(e.target.dataset.form);
-                    else p.caughtForms = p.caughtForms.filter(f => f !== e.target.dataset.form);
-                }
+                if (!p.caughtForms) p.caughtForms = [];
+                if (e.target.checked) p.caughtForms.push(e.target.dataset.form);
+                else p.caughtForms = p.caughtForms.filter(f => f !== e.target.dataset.form);
                 Storage.save();
                 UI.renderDex();
             }
         });
     }
 
-    // PokeAPI Sync
+    // POKEAPI SYNC
     const apiBtn = document.getElementById('api-sync-btn');
     if (apiBtn) {
         apiBtn.addEventListener('click', async () => {
@@ -597,7 +519,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Data Management
+    // DATA MANAGMENT
     const btnCopy = document.getElementById('btn-copy-export');
     const btnImport = document.getElementById('btn-import-sync');
     const btnClear = document.getElementById('btn-clear-data');
@@ -644,6 +566,3 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
-
-
-```
