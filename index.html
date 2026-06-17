@@ -322,7 +322,8 @@
                     <textarea id="sync-import-area" placeholder="Paste export code string here..." class="w-full h-32 p-3 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-indigo-500 resize-none"></textarea>
                     <button id="btn-import-sync" class="w-full py-3 bg-slate-800 hover:bg-indigo-600 text-white border border-slate-700 hover:border-transparent font-bold text-xs rounded-xl transition">⚡ Load Sync Data</button>
                 </div>
-                <div class="bg-slate-900/40 border border-slate-800 p-6 rounded-2xl sm:col-span-2 flex justify-between items-center">
+                <!-- THIS IS THE FIX: lg:col-span-2 instead of sm:col-span-2 -->
+                <div class="bg-slate-900/40 border border-slate-800 p-6 rounded-2xl lg:col-span-2 flex justify-between items-center">
                     <div class="text-xs text-slate-400">
                         <p><strong>Storage Used:</strong> <span id="storage-used">0 KB</span></p>
                     </div>
