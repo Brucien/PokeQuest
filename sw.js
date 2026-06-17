@@ -3,7 +3,7 @@
  * Hardened Hybrid Caching Architecture
  */
 
-const CACHE_VERSION = 'v1.0.3'; // Incremented cache key to force immediate browser updates
+const CACHE_VERSION = 'v1.0.4'; // Incremented cache key to force immediate browser updates
 const STATIC_CACHE = `pokequest-static-${CACHE_VERSION}`;
 const RUNTIME_CACHE = `pokequest-runtime-${CACHE_VERSION}`;
 
